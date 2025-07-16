@@ -34,6 +34,5 @@ def register_user(payload: RegisterRequest):
 
 
 @router.get("/users")
-@router.get("/users/", include_in_schema=False)
 def registered_users():
     return [User(**user.model_dump()) for user in fake_users_db.values()]
