@@ -3,7 +3,7 @@ from typing import Dict
 from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
 
-from app.domain.agent import Agent
+from app.agents.domain.agent import Agent
 from app.domain.user import User, UserInDB
 
 router = APIRouter()
