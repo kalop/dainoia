@@ -31,4 +31,3 @@ htmlcov/
 # Uvicorn reload artifacts
 *.pid
 
-frontend/*
