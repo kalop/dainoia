@@ -1,22 +1,50 @@
+import asyncio
+
 import typer
 
+from app.agents.repositories.agent_repository import MongoAgentRepository
 from app.agents.services.agent_service import AgentService
+from app.conversations.services.conversation_service import ConversationService
 
 cli = typer.Typer()
 
-agent_service = AgentService()
+conversation_service = ConversationService()
 
 
-@cli.command()
+def get_agent_service() -> AgentService:
+    repo = MongoAgentRepository()
+    return AgentService(repo)
+
+
+@cli.command("list-agents")
 def list_agents():
-    agents = agent_service.list_available_agents()
-    typer.echo(f"Available agents: {agents}")
+    agent_service: AgentService = get_agent_service()
+
+    async def _run():
+        agents = await agent_service.list_available_agents()
+        for agent in agents:
+            # agent = agent.model_dump()
+            typer.echo(f"{agent.id}  |  {agent.name}")
+
+    asyncio.run(_run())
 
 
 @cli.command()
-def call_agent(agent_type: str):
-    result = agent_service.create_agent()
+def call_agent():
+    agent_service: AgentService = get_agent_service()
+
+    result = agent_service.create()
     typer.echo(result)
+
+
+@cli.command()
+def send_message():
+    user_id = "User1234"
+    agent_id = "Agent1234"
+    message = "What things have this color?"
+
+    response = conversation_service.send_direct_message(user_id, agent_id, message)
+    typer.echo(response)
 
 
 if __name__ == "__main__":

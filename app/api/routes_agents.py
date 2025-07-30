@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordBearer
 
 from app.agents.domain.agent import Agent
-from app.domain.user import User, UserInDB
+from app.domain.user import User
 
 router = APIRouter()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")

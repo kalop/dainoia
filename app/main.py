@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 # app/middleware/strip_trailing_slash.py
@@ -6,6 +8,7 @@ from starlette.requests import Request
 
 from app.api.routes_auth import router as auth_router
 from app.api.routes_users import router as users_router
+from app.infrastructure.db.mongo import get_client
 
 
 class StripTrailingSlashMiddleware(BaseHTTPMiddleware):
@@ -17,7 +20,20 @@ class StripTrailingSlashMiddleware(BaseHTTPMiddleware):
         return await call_next(request)
 
 
-app = FastAPI()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # STARTUP ────────
+    client = get_client()  # fuerza la creación
+    print("Mongo conectado")
+
+    yield  #  ←  aquí la app ya está levantada
+
+    # SHUTDOWN ──────
+    client.close()
+    print("Mongo cerrado")
+
+
+app = FastAPI(lifespan=lifespan)
 app.add_middleware(StripTrailingSlashMiddleware)
 
 app.include_router(users_router)
