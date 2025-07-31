@@ -3,7 +3,7 @@ from typing import List, Protocol
 
 from bson import ObjectId
 
-from app.agents.domain.agent import Agent
+from app.agent.domain.agent import Agent
 from app.infrastructure.db.mongo import get_db
 
 

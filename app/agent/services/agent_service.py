@@ -1,8 +1,8 @@
 from typing import List
 
-from app.agents.domain.agent import Agent
-from app.agents.domain.agent_factory import AgentFactory, AgentTypes
-from app.agents.repositories.agent_repository import AgentRepository
+from app.agent.domain.agent import Agent
+from app.agent.domain.agent_factory import AgentFactory, AgentTypes
+from app.agent.repositories.agent_repository import AgentRepository
 
 
 class AgentService:

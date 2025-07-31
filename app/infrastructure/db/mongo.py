@@ -1,15 +1,16 @@
-from motor.motor_asyncio import AsyncIOMotorClient
+from pymongo import AsyncMongoClient
 
 from config import MONGO_DB, MONGO_URI
 
-_client: AsyncIOMotorClient | None = None
+client: AsyncMongoClient | None = None
 
 
-def get_client() -> AsyncIOMotorClient:
-    global _client
-    if _client is None:
-        _client = AsyncIOMotorClient(MONGO_URI)
-    return _client
+def get_client() -> AsyncMongoClient:
+    # global _client
+    global client
+    if client is None:
+        client = AsyncMongoClient(MONGO_URI)
+    return client
 
 
 def get_db():

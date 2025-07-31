@@ -1,4 +1,4 @@
-from app.agents.domain.agent_factory import AgentFactory, AgentTypes
+from app.agent.domain.agent_factory import AgentFactory, AgentTypes
 
 
 class ConversationService:

@@ -2,9 +2,9 @@ import asyncio
 
 import typer
 
-from app.agents.repositories.agent_repository import MongoAgentRepository
-from app.agents.services.agent_service import AgentService
-from app.conversations.services.conversation_service import ConversationService
+from app.agent.repositories.agent_repository import MongoAgentRepository
+from app.agent.services.agent_service import AgentService
+from app.conversation.services.conversation_service import ConversationService
 
 cli = typer.Typer()
 
@@ -40,7 +40,7 @@ def call_agent():
 @cli.command()
 def send_message():
     user_id = "User1234"
-    agent_id = "Agent1234"
+    agent_id = "3dfe5c6c-410e-443e-b84d-73c90a3623b0"
     message = "What things have this color?"
 
     response = conversation_service.send_direct_message(user_id, agent_id, message)
