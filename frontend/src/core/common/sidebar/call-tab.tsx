@@ -1,20 +1,122 @@
-import  { useState } from 'react'
-import { Link } from 'react-router-dom'
-import ImageWithBasePath from '../imageWithBasePath'
-import { all_routes } from '../../../feature-module/router/all_routes'
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import ImageWithBasePath from '../imageWithBasePath';
+import { all_routes } from '../../../feature-module/router/all_routes';
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import { useApi } from '../../hooks/useApi';
+import { chatService, type User } from '../../services/chatService';
 import "overlayscrollbars/overlayscrollbars.css";
 
+// Types for call functionality
+interface Call {
+  id: string;
+  caller_id: string;
+  receiver_id: string;
+  call_type: 'audio' | 'video';
+  status: 'missed' | 'completed' | 'declined';
+  duration?: number; // in seconds
+  timestamp: string;
+  caller?: User;
+  receiver?: User;
+}
+
 export const CallTab = () => {
-    const routes = all_routes
-    const [activeTab,setActiveTab] = useState('All Calls')
+  const routes = all_routes;
+  const [activeTab, setActiveTab] = useState('All Calls');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredCalls, setFilteredCalls] = useState<Call[]>([]);
+  
+  // Mock data for calls - replace with actual API call
+  const { data: calls, loading, error } = useApi(
+    () => Promise.resolve([] as Call[]), // Replace with actual API call
+    []
+  );
+
+  // Filter calls based on search query and active tab
+  useEffect(() => {
+    if (!calls) return;
+    
+    let filtered = calls;
+    
+    // Filter by search query
+    if (searchQuery.trim()) {
+      filtered = filtered.filter(call => 
+        call.caller?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        call.caller?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        call.receiver?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        call.receiver?.username.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+    }
+    
+    // Filter by active tab
+    if (activeTab === 'Missed Calls') {
+      filtered = filtered.filter(call => call.status === 'missed');
+    } else if (activeTab === 'Outgoing') {
+      filtered = filtered.filter(call => call.status === 'completed');
+    } else if (activeTab === 'Incoming') {
+      filtered = filtered.filter(call => call.status === 'completed');
+    }
+    
+    setFilteredCalls(filtered);
+  }, [searchQuery, activeTab, calls]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled by useEffect
+  };
+
+  const formatDuration = (seconds?: number) => {
+    if (!seconds) return '';
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+  };
+
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffInHours < 48) {
+      return 'Yesterday';
+    } else {
+      return date.toLocaleDateString();
+    }
+  };
+
+  const getCallIcon = (call: Call) => {
+    const isIncoming = call.caller_id !== 'current_user_id'; // Replace with actual user ID
+    
+    if (call.status === 'missed') {
+      return 'ti ti-phone-x text-danger';
+    } else if (call.status === 'declined') {
+      return 'ti ti-phone-off text-warning';
+    } else {
+      return isIncoming ? 'ti ti-phone-incoming text-success' : 'ti ti-phone-outgoing text-primary';
+    }
+  };
+
+  const getCallStatusText = (call: Call) => {
+    const isIncoming = call.caller_id !== 'current_user_id'; // Replace with actual user ID
+    
+    if (call.status === 'missed') {
+      return 'Missed call';
+    } else if (call.status === 'declined') {
+      return 'Declined';
+    } else {
+      return isIncoming ? 'Incoming' : 'Outgoing';
+    }
+  };
+
   return (
     <>
         <div className="sidebar-content active slimscroll">
         <OverlayScrollbarsComponent
             options={{
               scrollbars: {
-                autoHide: 'scroll', // or 'leave', 'move', etc.
+              autoHide: 'scroll',
                 autoHideDelay: 1000,
               },
             }}
@@ -59,14 +161,17 @@ export const CallTab = () => {
                   </div>
                 </div>
               </div>
-              {/* Chat Search */}
+              
+              {/* Call Search */}
               <div className="search-wrap">
-                <form >
+                <form onSubmit={handleSearch}>
                   <div className="input-group">
                     <input
                       type="text"
                       className="form-control"
                       placeholder="Search"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <span className="input-group-text">
                       <i className="ti ti-search" />
@@ -74,11 +179,11 @@ export const CallTab = () => {
                   </div>
                 </form>
               </div>
-              {/* /Chat Search */}
             </div>
+            
             <div className="sidebar-body chat-body" id="chatsidebar">
               {/* Left Chat Title */}
-              <div className="d-flex  align-items-center mb-3">
+              <div className="d-flex align-items-center mb-3">
                 <h5 className="chat-title2 me-2">{activeTab}</h5>
                 <div className="dropdown">
                   <Link
@@ -89,21 +194,13 @@ export const CallTab = () => {
                   >
                     <i className="ti ti-chevron-down" />
                   </Link>
-                  <ul
-                    className=" dropdown-menu dropdown-menu-end p-3"
-                    id="innerTab"
-                    role="tablist"
-                  >
+                  <ul className="dropdown-menu dropdown-menu-end p-3" id="innerTab" role="tablist">
                     <li role="presentation">
                       <Link
                         className="dropdown-item active"
                         id="all-calls-tab"
-                        data-bs-toggle="tab"
-                        to="#all-calls"
-                        role="tab"
-                        aria-controls="all-calls"
-                        aria-selected="true"
-                        onClick={()=>setActiveTab('All Calls')}
+                        onClick={() => setActiveTab('All Calls')}
+                        to="#"
                       >
                         All Calls
                       </Link>
@@ -111,686 +208,95 @@ export const CallTab = () => {
                     <li role="presentation">
                       <Link
                         className="dropdown-item"
-                        id="audio-calls-tab"
-                        data-bs-toggle="tab"
-                        to="#audio-calls"
-                        role="tab"
-                        aria-controls="audio-calls"
-                        aria-selected="false"
-                        onClick={()=>setActiveTab('Audio Calls')}
+                        id="missed-calls-tab"
+                        onClick={() => setActiveTab('Missed Calls')}
+                        to="#"
                       >
-                        Audio Calls
+                        Missed Calls
                       </Link>
                     </li>
                     <li role="presentation">
                       <Link
                         className="dropdown-item"
-                        id="video-calls-tab"
-                        data-bs-toggle="tab"
-                        to="#video-calls"
-                        role="tab"
-                        aria-controls="video-calls"
-                        aria-selected="false"
-                        onClick={()=>setActiveTab('Video Calls')}
+                        id="outgoing-calls-tab"
+                        onClick={() => setActiveTab('Outgoing')}
+                        to="#"
                       >
-                        Video Calls
+                        Outgoing
+                      </Link>
+                    </li>
+                    <li role="presentation">
+                      <Link
+                        className="dropdown-item"
+                        id="incoming-calls-tab"
+                        onClick={() => setActiveTab('Incoming')}
+                        to="#"
+                      >
+                        Incoming
                       </Link>
                     </li>
                   </ul>
                 </div>
               </div>
-              {/* /Left Chat Title */}
-              <div className="tab-content" id="innerTabContent">
-                <div
-                  className="tab-pane fade show active"
-                  id="all-calls"
-                  role="tabpanel"
-                  aria-labelledby="all-calls-tab"
-                >
+              
+              {loading ? (
+                <div className="text-center p-4">
+                  <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                            </div>
+                          </div>
+              ) : error ? (
+                <div className="alert alert-danger m-3" role="alert">
+                  {error}
+                        </div>
+              ) : filteredCalls.length === 0 ? (
+                <div className="text-center p-4 text-muted">
+                  <i className="ti ti-phone fs-1 mb-3"></i>
+                  <p>No calls found</p>
+                  <small>Your call history will appear here</small>
+                    </div>
+              ) : (
                   <div className="chat-users-wrap">
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
+                  {filteredCalls.map((call) => (
+                    <Link
+                      key={call.id}
+                      to="#"
+                      className="chat-user-list"
+                      data-bs-toggle="modal"
+                      data-bs-target="#call-details"
+                    >
+                      <div className="avatar avatar-lg me-2">
                           <ImageWithBasePath
-                            src="assets/img/profiles/avatar-06.jpg"
+                          src={call.caller?.avatar_url || "assets/img/profiles/avatar-01.jpg"}
                             className="rounded-circle"
-                            alt="image"
+                          alt={call.caller?.full_name || call.caller?.username || 'Unknown'}
                           />
                         </div>
                         <div className="chat-user-info">
                           <div className="chat-user-msg">
-                            <h6>Edward Lietz</h6>
-                            <p>
-                              <i className="ti ti-phone-outgoing text-purple me-2" />
-                              20 Min Ago
-                            </p>
+                          <h6>{call.caller?.full_name || call.caller?.username || 'Unknown'}</h6>
+                          <div className="d-flex align-items-center">
+                            <i className={`${getCallIcon(call)} me-2`}></i>
+                            <span className="me-2">{getCallStatusText(call)}</span>
+                            {call.duration && (
+                              <span className="text-muted">({formatDuration(call.duration)})</span>
+                            )}
+                            </div>
+                          </div>
                           </div>
                           <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
+                        <span>{formatTime(call.timestamp)}</span>
                         </div>
                       </Link>
+                  ))}
                     </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-01.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6 className="">Mark Villiams</h6>
-                            <p className="fs-14">
-                              <i className="ti ti-phone-incoming me-2 fs-14 text-success" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user ">
-                            <span className="mb-2">08m 12s</span>
-                            <div className="d-flex justify-content-end">
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-05.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Federico Wells</h6>
-                            <p>
-                              <i className="ti ti-video-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-03.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Clyde Smith</h6>
-                            <p>
-                              <i className="ti ti-phone-outgoing text-purple me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-04.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Carla Jenkins</h6>
-                            <p>
-                              <i className="ti ti-video text-success me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-02.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Sarika Jain</h6>
-                            <p>
-                              <i className="ti ti-phone-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg bg-purple offline avatar-rounded me-2">
-                          <span className="avatar-title fs-14 fw-medium">
-                            AG
-                          </span>
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Amfr_boys_Group</h6>
-                            <p>
-                              <i className="ti ti-video-minus text-purple me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-10.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Wilbur Martinez</h6>
-                            <p>
-                              <i className="ti ti-phone-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="tab-pane fade"
-                  id="audio-calls"
-                  role="tabpanel"
-                  aria-labelledby="audio-calls-tab"
-                >
-                  <div className="chat-users-wrap">
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-06.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Edward Lietz</h6>
-                            <p>
-                              <i className="ti ti-phone-outgoing text-purple me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-01.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6 className="">Mark Villiams</h6>
-                            <p className="fs-14">
-                              <i className="ti ti-phone-incoming me-2 fs-14 text-success" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user ">
-                            <span className="mb-2">08m 12s</span>
-                            <div className="d-flex justify-content-end">
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-05.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Federico Wells</h6>
-                            <p className="fs-14">
-                              <i className="ti ti-phone-incoming me-2 fs-14 text-success" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user ">
-                            <span className="mb-2">08m 12s</span>
-                            <div className="d-flex justify-content-end">
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-03.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Clyde Smith</h6>
-                            <p>
-                              <i className="ti ti-phone-outgoing text-purple me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-04.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Carla Jenkins</h6>
-                            <p>
-                              <i className="ti ti-phone-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-02.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Sarika Jain</h6>
-                            <p>
-                              <i className="ti ti-phone-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg bg-purple avatar-rounded me-2">
-                          <span className="avatar-title fs-14 fw-medium">
-                            AG
-                          </span>
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Amfr_boys_Group</h6>
-                            <p className="fs-14">
-                              <i className="ti ti-phone-incoming me-2 fs-14 text-success" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user ">
-                            <span className="mb-2">08m 12s</span>
-                            <div className="d-flex justify-content-end">
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-10.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Wilbur Martinez</h6>
-                            <p>
-                              <i className="ti ti-phone-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-phone-call text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  className="tab-pane fade"
-                  id="video-calls"
-                  role="tabpanel"
-                  aria-labelledby="video-calls-tab"
-                >
-                  <div className="chat-users-wrap">
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-06.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Edward Lietz</h6>
-                            <p>
-                              <i className="ti ti-video text-success me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-01.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6 className="">Mark Villiams</h6>
-                            <p>
-                              <i className="ti ti-video-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-05.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Federico Wells</h6>
-                            <p>
-                              <i className="ti ti-video-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-03.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Clyde Smith</h6>
-                            <p>
-                              <i className="ti ti-video-minus text-purple me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-04.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Carla Jenkins</h6>
-                            <p>
-                              <i className="ti ti-video text-success me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-02.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Sarika Jain</h6>
-                            <p>
-                              <i className="ti ti-video-minus text-purple me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg bg-purple avatar-rounded me-2">
-                          <span className="avatar-title fs-14 fw-medium">
-                            AG
-                          </span>
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Amfr_boys_Group</h6>
-                            <p>
-                              <i className="ti ti-video-off text-danger me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                    <div className="chat-list">
-                      <Link to={routes.allCalls} className="chat-user-list">
-                        <div className="avatar avatar-lg online me-2">
-                          <ImageWithBasePath
-                            src="assets/img/profiles/avatar-10.jpg"
-                            className="rounded-circle"
-                            alt="image"
-                          />
-                        </div>
-                        <div className="chat-user-info">
-                          <div className="chat-user-msg">
-                            <h6>Wilbur Martinez</h6>
-                            <p>
-                              <i className="ti ti-video-minus text-purple me-2" />
-                              20 Min Ago
-                            </p>
-                          </div>
-                          <div className="chat-user-time">
-                            <span className="time">08m 12s</span>
-                            <div>
-                              <i className="ti ti-video text-pink" />
-                            </div>
-                          </div>
-                        </div>
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
           </OverlayScrollbarsComponent>
         </div>
     </>
-  )
-}
+  );
+};
+
+export default CallTab;

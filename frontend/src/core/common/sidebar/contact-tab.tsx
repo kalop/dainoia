@@ -1,22 +1,91 @@
 
-import ImageWithBasePath from '../imageWithBasePath'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react';
+import ImageWithBasePath from '../imageWithBasePath';
+import { Link } from 'react-router-dom';
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import { useApi } from '../../hooks/useApi';
+import { chatService, type User } from '../../services/chatService';
 import "overlayscrollbars/overlayscrollbars.css";
+
 const ContactTab = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredContacts, setFilteredContacts] = useState<User[]>([]);
+  
+  // Get all users (contacts)
+  const { data: contacts, loading, error } = useApi(
+    () => chatService.getOnlineUsers(), // This will need to be updated to get all users
+    []
+  );
+
+  // Filter contacts based on search query
+  useEffect(() => {
+    if (!contacts) return;
+    
+    if (searchQuery.trim()) {
+      const filtered = contacts.filter(contact => 
+        contact.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        contact.username.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredContacts(filtered);
+    } else {
+      setFilteredContacts(contacts);
+    }
+  }, [searchQuery, contacts]);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Search is handled by useEffect
+  };
+
+  const groupContactsByFirstLetter = (contacts: User[]) => {
+    const grouped: { [key: string]: User[] } = {};
+    
+    contacts.forEach(contact => {
+      const firstLetter = (contact.full_name || contact.username).charAt(0).toUpperCase();
+      if (!grouped[firstLetter]) {
+        grouped[firstLetter] = [];
+      }
+      grouped[firstLetter].push(contact);
+    });
+    
+    return Object.keys(grouped).sort().map(letter => ({
+      letter,
+      contacts: grouped[letter].sort((a, b) => 
+        (a.full_name || a.username).localeCompare(b.full_name || b.username)
+      )
+    }));
+  };
+
+  const formatLastSeen = (lastSeen?: string) => {
+    if (!lastSeen) return 'Never';
+    
+    const date = new Date(lastSeen);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+    
+    if (diffInHours < 1) {
+      return 'Just now';
+    } else if (diffInHours < 24) {
+      return `last seen ${Math.floor(diffInHours)} hours ago`;
+    } else {
+      const days = Math.floor(diffInHours / 24);
+      return `last seen ${days} days ago`;
+    }
+  };
+
   return (
     <>
-        {/* Chats sidebar */}
-        <div className="sidebar-content active slimscroll">
+      {/* Contacts sidebar */}
+      <div className="sidebar-content active slimscroll">
         <OverlayScrollbarsComponent
-            options={{
-              scrollbars: {
-                autoHide: 'scroll',
-                autoHideDelay: 1000,
-              },
-            }}
-            style={{ maxHeight: '100vh' }}
-          >
+          options={{
+            scrollbars: {
+              autoHide: 'scroll',
+              autoHideDelay: 1000,
+            },
+          }}
+          style={{ maxHeight: '100vh' }}
+        >
           <div className="slimscroll">
             <div className="chat-search-header">
               <div className="header-title d-flex align-items-center justify-content-between">
@@ -32,14 +101,17 @@ const ContactTab = () => {
                   </Link>
                 </div>
               </div>
-              {/* Chat Search */}
+              
+              {/* Contact Search */}
               <div className="search-wrap">
-                <form >
+                <form onSubmit={handleSearch}>
                   <div className="input-group">
                     <input
                       type="text"
                       className="form-control"
                       placeholder="Search Contacts"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                     />
                     <span className="input-group-text">
                       <i className="ti ti-search" />
@@ -47,170 +119,70 @@ const ContactTab = () => {
                   </div>
                 </form>
               </div>
-              {/* /Chat Search */}
             </div>
+            
             <div className="sidebar-body chat-body">
               {/* Left Chat Title */}
               <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5>All Contacts</h5>
               </div>
-              {/* /Left Chat Title */}
-              <div className="chat-users-wrap">
-                <div className="mb-4">
-                  <h6 className="mb-2">A</h6>
-                  <div className="chat-list">
-                    <Link
-                      to="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#contact-details"
-                      className="chat-user-list"
-                    >
-                      <div className="avatar avatar-lg online me-2">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-01.jpg"
-                          className="rounded-circle"
-                          alt="image"
-                        />
-                      </div>
-                      <div className="chat-user-info">
-                        <div className="chat-user-msg">
-                          <h6>Aaryian Jose</h6>
-                          <p>last seen 5 days ago</p>
-                        </div>
-                      </div>
-                    </Link>
+              
+              {loading ? (
+                <div className="text-center p-4">
+                  <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
                   </div>
                 </div>
-                <div className="mb-4">
-                  <h6 className="mb-2">C</h6>
-                  <div className="chat-list">
-                    <Link
-                      to="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#contact-details"
-                      className="chat-user-list"
-                    >
-                      <div className="avatar avatar-lg offline me-2">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-03.jpg"
-                          className="rounded-circle"
-                          alt="image"
-                        />
-                      </div>
-                      <div className="chat-user-info">
-                        <div className="chat-user-msg">
-                          <h6>Clyde Smith</h6>
-                          <p>is busy now!</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                  <div className="chat-list">
-                    <Link
-                      to="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#contact-details"
-                      className="chat-user-list"
-                    >
-                      <div className="avatar avatar-lg online me-2">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-04.jpg"
-                          className="rounded-circle"
-                          alt="image"
-                        />
-                      </div>
-                      <div className="chat-user-info">
-                        <div className="chat-user-msg">
-                          <h6>Carla Jenkins</h6>
-                          <p>is online now</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
+              ) : error ? (
+                <div className="alert alert-danger m-3" role="alert">
+                  {error}
                 </div>
-                <div className="mb-4">
-                  <h6 className="mb-2">D</h6>
-                  <div className="chat-list">
-                    <Link
-                      to="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#contact-details"
-                      className="chat-user-list"
-                    >
-                      <div className="avatar avatar-lg away me-2">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-14.jpg"
-                          className="rounded-circle"
-                          alt="image"
-                        />
-                      </div>
-                      <div className="chat-user-info">
-                        <div className="chat-user-msg">
-                          <h6>Danielle Baker</h6>
-                          <p>last seen a week ago</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
+              ) : filteredContacts.length === 0 ? (
+                <div className="text-center p-4 text-muted">
+                  <i className="ti ti-users fs-1 mb-3"></i>
+                  <p>No contacts found</p>
+                  <small>Add contacts to start chatting</small>
                 </div>
-                <div className="mb-4">
-                  <h6 className="mb-2">E</h6>
-                  <div className="chat-list">
-                    <Link
-                      to="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#contact-details"
-                      className="chat-user-list"
-                    >
-                      <div className="avatar avatar-lg online me-2">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-06.jpg"
-                          className="rounded-circle"
-                          alt="image"
-                        />
+              ) : (
+                <div className="chat-users-wrap">
+                  {groupContactsByFirstLetter(filteredContacts).map(({ letter, contacts }) => (
+                    <div key={letter} className="mb-4">
+                      <h6 className="mb-2">{letter}</h6>
+                      <div className="chat-list">
+                        {contacts.map((contact) => (
+                          <Link
+                            key={contact.id}
+                            to="#"
+                            data-bs-toggle="modal"
+                            data-bs-target="#contact-details"
+                            className="chat-user-list"
+                          >
+                            <div className={`avatar avatar-lg ${contact.is_online ? 'online' : 'offline'} me-2`}>
+                              <ImageWithBasePath
+                                src={contact.avatar_url || "assets/img/profiles/avatar-01.jpg"}
+                                className="rounded-circle"
+                                alt={contact.full_name || contact.username}
+                              />
+                            </div>
+                            <div className="chat-user-info">
+                              <div className="chat-user-msg">
+                                <h6>{contact.full_name || contact.username}</h6>
+                                <p>{formatLastSeen(contact.last_seen)}</p>
+                              </div>
+                            </div>
+                          </Link>
+                        ))}
                       </div>
-                      <div className="chat-user-info">
-                        <div className="chat-user-msg">
-                          <h6>Edward Lietz</h6>
-                          <p>Do you know which App or ...</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="mb-4">
-                  <h6 className="mb-2">F</h6>
-                  <div className="chat-list">
-                    <Link
-                      to="#"
-                      data-bs-toggle="modal"
-                      data-bs-target="#contact-details"
-                      className="chat-user-list"
-                    >
-                      <div className="avatar avatar-lg online me-2">
-                        <ImageWithBasePath
-                          src="assets/img/profiles/avatar-07.jpg"
-                          className="rounded-circle"
-                          alt="image"
-                        />
-                      </div>
-                      <div className="chat-user-info">
-                        <div className="chat-user-msg">
-                          <h6>Federico Wells</h6>
-                          <p>last seen 10 min ago</p>
-                        </div>
-                      </div>
-                    </Link>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           </div>
-          </OverlayScrollbarsComponent>
-        </div>
-        {/* / Chats sidebar */}
+        </OverlayScrollbarsComponent>
+      </div>
     </>
-  )
-}
+  );
+};
 
-export default ContactTab
+export default ContactTab;

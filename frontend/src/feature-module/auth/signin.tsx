@@ -1,18 +1,48 @@
 import { useEffect, useState } from 'react'
 import ImageWithBasePath from '../../core/common/imageWithBasePath'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { all_routes } from '../router/all_routes'
+import { useAuth } from '../../core/hooks/useAuth'
 
 const Signin = () => {
   const routes = all_routes;
+  const navigate = useNavigate();
+  const { loginUser, loading, error, isAuthenticated } = useAuth();
   const [isPasswordVisible, setPasswordVisible] = useState(false);
+  const [formData, setFormData] = useState({
+    username: '',
+    password: ''
+  });
 
   const togglePasswordVisibility = () => {
     setPasswordVisible((prevState) => !prevState);
   };
+
   useEffect(() => {
     localStorage.setItem('menuOpened', '')
   }, [])
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate(routes.index);
+    }
+  }, [isAuthenticated, navigate, routes.index]);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await loginUser(formData);
+    } catch (err) {
+      console.error('Login failed:', err);
+    }
+  };
   
   return (
     <>
@@ -22,7 +52,7 @@ const Signin = () => {
           <div className="col-lg-6 col-md-12 col-sm-12">
             <div className="row justify-content-center align-items-center vh-100 overflow-auto flex-wrap login-bg1 ">
               <div className="col-md-9 mx-auto p-4">
-                <form >
+                <form onSubmit={handleSubmit}>
                   <div>
                     <div className=" mx-auto mb-5 text-center">
                       <ImageWithBasePath
@@ -36,16 +66,24 @@ const Signin = () => {
                         <div className=" mb-4">
                           <h2 className="mb-2">Welcome!</h2>
                           <p className="mb-0 fs-16">
-                            Sign in to see what you’ve missed.
+                            Sign in to see what you've missed.
                           </p>
                         </div>
+                        {error && (
+                          <div className="alert alert-danger" role="alert">
+                            {error}
+                          </div>
+                        )}
                         <div className="mb-3 ">
                           <label className="form-label">User Name</label>
                           <div className="input-icon mb-3 position-relative">
                             <input
                               type="text"
-                              defaultValue=""
+                              name="username"
+                              value={formData.username}
+                              onChange={handleInputChange}
                               className="form-control"
+                              required
                             />
                             <span className="input-icon-addon">
                               <i className="ti ti-user" />
@@ -55,7 +93,11 @@ const Signin = () => {
                           <div className="input-icon ">
                           <input
                             type={isPasswordVisible ? "text" : "password"}
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
                             className="pass-input form-control"
+                            required
                           />
                           <span
                             className={`ti toggle-password ${
@@ -85,12 +127,13 @@ const Signin = () => {
                           </div>
                         </div>
                         <div className="mb-4">
-                          <Link
-                            to={routes.index}
+                          <button
+                            type="submit"
                             className="btn btn-primary w-100 justify-content-center"
+                            disabled={loading}
                           >
-                            Sign In
-                          </Link>
+                            {loading ? 'Signing In...' : 'Sign In'}
+                          </button>
                         </div>
                         <div className="login-or mb-3">
                           <span className="span-or">Or sign in with </span>
@@ -127,7 +170,7 @@ const Signin = () => {
                     </div>
                     <div className="mt-5 text-center">
                       <p className="mb-0 text-gray-9">
-                        Don’t have a account?{" "}
+                        Don't have a account?{" "}
                         <Link to={routes.signup} className="link-primary">
                           Sign Up
                         </Link>
