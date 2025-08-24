@@ -1,7 +1,4 @@
-from dataclasses import asdict
 from typing import List, Protocol
-
-from bson import ObjectId
 
 from app.agent.domain.agent import Agent
 from app.infrastructure.db.mongo import get_db
@@ -21,10 +18,10 @@ class MongoAgentRepository(AgentRepository):
         return [Agent(**doc) for doc in docs]
 
     async def get(self, agent_id: str) -> Agent | None:
-        doc = await self._col.find_one({"_id": ObjectId(agent_id)})
+        doc = await self._col.find_one({"id": agent_id})
         return Agent(**doc) if doc else None
 
-    async def save(self, agent: Agent):
-        data = asdict(agent)
-        data["_id"] = ObjectId(agent.id)
-        await self._col.replace_one({"_id": data["_id"]}, data, upsert=True)
+    # async def save(self, agent: Agent):
+    #     data = asdict(agent)
+    #     data["_id"] = ObjectId(agent.id)
+    #     await self._col.replace_one({"_id": data["_id"]}, data, upsert=True)

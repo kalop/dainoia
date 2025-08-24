@@ -1,26 +1,29 @@
-from app.agent.domain.agent_factory import AgentFactory, AgentTypes
+from app.agent.repositories.agent_repository import AgentRepository
 
 
 class ConversationService:
+    def __init__(self, agent_repository: AgentRepository):
+        self.agent_repository = agent_repository
 
-    def send_direct_message(
+    async def send_direct_message(
         self, user_id: str, agent_id: str, message: str, conversation_id: str = None
     ):
-
-        # Get the agent form DB
-        agent_factory = AgentFactory()
-        agent = agent_factory.create(AgentTypes.GENERIC)
+        # Get the agent from DB
+        agent = await self.agent_repository.get(agent_id)
+        if not agent:
+            raise ValueError(f"Agent with id {agent_id} not found")
 
         # Get the conversation / create
         if conversation_id:
             pass
-        # Atomic operation
-        # -- Update history
-        
+        # TODO: Implement conversation retrieval/creation logic
+
+        # -- Update agent.history with
+        # TODO: Implement history update logic
 
         # -- Create AI service call
 
-        # Return response
+        # Build conversation messages
         messages = [
             {
                 "role": "user",
@@ -44,6 +47,7 @@ class ConversationService:
             },
             {"role": "user", "content": message},
         ]
+
         result = agent.call(messages)
         # pprint(result)
         return result.choices[0].message.content

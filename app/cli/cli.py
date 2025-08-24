@@ -8,12 +8,15 @@ from app.conversation.services.conversation_service import ConversationService
 
 cli = typer.Typer()
 
-conversation_service = ConversationService()
-
 
 def get_agent_service() -> AgentService:
     repo = MongoAgentRepository()
     return AgentService(repo)
+
+
+def get_conversation_service() -> ConversationService:
+    repo = MongoAgentRepository()
+    return ConversationService(repo)
 
 
 @cli.command("list-agents")
@@ -37,13 +40,21 @@ def call_agent():
     typer.echo(result)
 
 
-@cli.command()
+@cli.command("send-message")
 def send_message():
     user_id = "User1234"
     agent_id = "3dfe5c6c-410e-443e-b84d-73c90a3623b0"
     message = "What things have this color?"
 
-    response = conversation_service.send_direct_message(user_id, agent_id, message)
+    conversation_service: ConversationService = get_conversation_service()
+
+    async def _run():
+        response = await conversation_service.send_direct_message(
+            user_id, agent_id, message
+        )
+        return response
+
+    response = asyncio.run(_run())
     typer.echo(response)
 
 
