@@ -4,975 +4,242 @@ import { Link } from "react-router-dom";
 import { all_routes } from "../../../feature-module/router/all_routes";
 import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import "overlayscrollbars/overlayscrollbars.css";
+import { useState, useEffect } from "react";
+import { useApi } from "../../hooks/useApi";
+import { groupChatService, type GroupInfo } from "../../services/groupChatService";
 
 const GroupTab = () => {
   const routes = all_routes;
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredGroups, setFilteredGroups] = useState<GroupInfo[]>([]);
+
+  // Fetch groups from API
+  const { data: groups, loading, error } = useApi(
+    () => groupChatService.getGroups(),
+    []
+  );
+
+  // Filter groups based on search query
+  useEffect(() => {
+    if (groups) {
+      const filtered = groups.filter(group =>
+        group.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        group.description?.toLowerCase().includes(searchQuery.toLowerCase())
+      );
+      setFilteredGroups(filtered);
+    }
+  }, [groups, searchQuery]);
+
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
+
+    if (diffInHours < 24) {
+      return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } else if (diffInHours < 48) {
+      return 'Yesterday';
+    } else if (diffInHours < 168) {
+      return date.toLocaleDateString([], { weekday: 'long' });
+    } else {
+      return date.toLocaleDateString([], { day: 'numeric', month: 'short', year: 'numeric' });
+    }
+  };
+
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  const renderGroupItem = (group: GroupInfo) => (
+    <div key={group.id} className="chat-list">
+      <Link to={`${routes.groupChat}/${group.id}`} className="chat-user-list">
+        <div className="avatar avatar-lg online me-2">
+          {group.avatar_url ? (
+            <ImageWithBasePath
+              src={group.avatar_url}
+              className="rounded-circle"
+              alt={group.name}
+            />
+          ) : (
+            <div className="avatar avatar-lg bg-primary avatar-rounded me-2">
+              <span className="avatar-title fs-14 fw-medium">
+                {getInitials(group.name)}
+              </span>
+            </div>
+          )}
+        </div>
+        <div className="chat-user-info">
+          <div className="chat-user-msg">
+            <h6>{group.name}</h6>
+            <p>{group.description || `${group.member_count} members`}</p>
+          </div>
+          <div className="chat-user-time">
+            <span className="time">{formatTime(group.updated_at)}</span>
+            <div className="chat-pin">
+              <span className="count-message fs-12 fw-semibold">
+                {group.online_count}
+              </span>
+            </div>
+          </div>
+        </div>
+      </Link>
+      <div className="chat-dropdown">
+        <Link className="#" to="#" data-bs-toggle="dropdown">
+          <i className="ti ti-dots-vertical" />
+        </Link>
+        <ul className="dropdown-menu dropdown-menu-end p-3">
+          <li>
+            <Link className="dropdown-item" to="#">
+              <i className="ti ti-box-align-right me-2" />
+              Archive Group
+            </Link>
+          </li>
+          <li>
+            <Link className="dropdown-item" to="#">
+              <i className="ti ti-volume-off me-2" />
+              Mute Notification
+            </Link>
+          </li>
+          <li>
+            <Link 
+              className="dropdown-item" 
+              to="#"
+              onClick={async () => {
+                try {
+                  await groupChatService.leaveGroup(group.id);
+                  // Refresh groups list
+                  window.location.reload();
+                } catch (error) {
+                  console.error('Failed to leave group:', error);
+                }
+              }}
+            >
+              <i className="ti ti-logout-2 me-2" />
+              Exit Group
+            </Link>
+          </li>
+          <li>
+            <Link className="dropdown-item" to="#">
+              <i className="ti ti-pinned me-2" />
+              Pin Group
+            </Link>
+          </li>
+          <li>
+            <Link className="dropdown-item" to="#">
+              <i className="ti ti-square-check me-2" />
+              Mark as Unread
+            </Link>
+          </li>
+        </ul>
+      </div>
+    </div>
+  );
+
   return (
     <>
-      {/* Chats sidebar */}
+      {/* Groups sidebar */}
       <div className="sidebar-content active slimscroll">
-      <OverlayScrollbarsComponent
-            options={{
-              scrollbars: {
-                autoHide: 'scroll',
-                autoHideDelay: 1000,
-              },
-            }}
-            style={{ maxHeight: '100vh' }}
-          >
-        <div className="slimscroll">
-          <div className="chat-search-header">
-            <div className="header-title d-flex align-items-center justify-content-between">
-              <h4 className="mb-3">Group</h4>
-              <div className="d-flex align-items-center mb-3">
-                <Link
-                  to="#"
-                  data-bs-toggle="modal"
-                  data-bs-target="#new-group"
-                  className="add-icon btn btn-primary p-0 d-flex align-items-center justify-content-center fs-16 me-2"
-                >
-                  <i className="ti ti-plus" />
-                </Link>
-                <div className="dropdown">
+        <OverlayScrollbarsComponent
+          options={{
+            scrollbars: {
+              autoHide: 'scroll',
+              autoHideDelay: 1000,
+            },
+          }}
+          style={{ maxHeight: '100vh' }}
+        >
+          <div className="slimscroll">
+            <div className="chat-search-header">
+              <div className="header-title d-flex align-items-center justify-content-between">
+                <h4 className="mb-3">Groups</h4>
+                <div className="d-flex align-items-center mb-3">
                   <Link
                     to="#"
-                    data-bs-toggle="dropdown"
-                    className="fs-16 text-default"
+                    data-bs-toggle="modal"
+                    data-bs-target="#new-group"
+                    className="add-icon btn btn-primary p-0 d-flex align-items-center justify-content-center fs-16 me-2"
                   >
-                    <i className="ti ti-dots-vertical" />
+                    <i className="ti ti-plus" />
                   </Link>
-                  <ul className="dropdown-menu p-3">
-                    <li>
-                      <Link
-                        className="dropdown-item"
-                        to="#"
-                        data-bs-toggle="modal"
-                        data-bs-target="#invite"
-                      >
-                        <i className="ti ti-send me-2" />
-                        Invite Others
-                      </Link>
-                    </li>
-                  </ul>
+                  <div className="dropdown">
+                    <Link
+                      to="#"
+                      data-bs-toggle="dropdown"
+                      className="fs-16 text-default"
+                    >
+                      <i className="ti ti-dots-vertical" />
+                    </Link>
+                    <ul className="dropdown-menu p-3">
+                      <li>
+                        <Link
+                          className="dropdown-item"
+                          to="#"
+                          data-bs-toggle="modal"
+                          data-bs-target="#invite"
+                        >
+                          <i className="ti ti-send me-2" />
+                          Invite Others
+                        </Link>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
               </div>
+              {/* Group Search */}
+              <div className="search-wrap">
+                <form onSubmit={(e) => e.preventDefault()}>
+                  <div className="input-group">
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="Search for groups..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <span className="input-group-text">
+                      <i className="ti ti-search" />
+                    </span>
+                  </div>
+                </form>
+              </div>
+              {/* /Group Search */}
             </div>
-            {/* Chat Search */}
-            <div className="search-wrap">
-              <form>
-                <div className="input-group">
-                  <input
-                    type="text"
-                    className="form-control"
-                    placeholder="Search For Contacts or Messages"
-                  />
-                  <span className="input-group-text">
-                    <i className="ti ti-search" />
-                  </span>
-                </div>
-              </form>
-            </div>
-            {/* /Chat Search */}
-          </div>
-          <div className="sidebar-body chat-body">
-            {/* Left Chat Title */}
-            <div className="d-flex justify-content-between align-items-center mb-3">
-              <h5>All Groups</h5>
-            </div>
-            {/* /Left Chat Title */}
-            <div className="chat-users-wrap">
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-01.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>The Dream Team</h6>
-                      <p>
-                        <span className="animate-typing">
-                          is typing
-                          <span className="dot mx-1" />
-                          <span className="dot me-1" />
-                          <span className="dot" />
-                        </span>
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-pin me-2" />
-                        <span className="count-message fs-12 fw-semibold">
-                          12
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
+            <div className="sidebar-body chat-body">
+              {/* Left Group Title */}
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5>All Groups ({filteredGroups.length})</h5>
               </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-02.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>The Meme Team</h6>
-                      <p>Do you know which...</p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">06:12 AM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-pin me-2" />
-                        <i className="ti ti-checks text-success" />
-                      </div>
+              {/* /Left Group Title */}
+              <div className="chat-users-wrap">
+                {loading ? (
+                  <div className="text-center p-4">
+                    <div className="spinner-border" role="status">
+                      <span className="visually-hidden">Loading...</span>
                     </div>
                   </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-03.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
+                ) : error ? (
+                  <div className="alert alert-danger m-3" role="alert">
+                    {error}
                   </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Tech Talk Tribe</h6>
-                      <p>Haha oh man</p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">03:15 AM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-pin me-2" />
-                        <span className="count-message fs-12 fw-semibold">
-                          55
-                        </span>
-                      </div>
-                    </div>
+                ) : filteredGroups.length === 0 ? (
+                  <div className="text-center p-4 text-muted">
+                    <i className="ti ti-users fs-1 mb-3"></i>
+                    <p>{searchQuery ? 'No groups found matching your search.' : 'No groups yet. Create your first group!'}</p>
                   </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg bg-pink avatar-rounded me-2">
-                    <span className="avatar-title fs-14 fw-medium">AG</span>
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Amfr_boys_Group</h6>
-                      <p>
-                        <i className="ti ti-photo me-2" />
-                        Photo
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">Yesterday</span>
-                      <div className="chat-pin">
-                        <span className="count-message fs-12 fw-semibold">
-                          5
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-04.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>The Academic Alliance</h6>
-                      <p className="text-success">
-                        <i className="ti ti-video-plus me-2" />
-                        Incoming Video Call
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">Sunday</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-checks text-success" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-05.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>The Chill Zone</h6>
-                      <p>
-                        <i className="ti ti-photo me-2" />
-                        Photo
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">Wednesday</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-pin me-2" />
-                        <span className="count-message fs-12 fw-semibold">
-                          12
-                        </span>
-                        <i className="bx bx-check-double" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-06.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Squad Goals</h6>
-                      <p>
-                        <i className="ti ti-file me-2" />
-                        Document
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-checks text-success" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg bg-skyblue online avatar-rounded me-2">
-                    <span className="avatar-title fs-14 fw-medium">GU</span>
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Gustov_family</h6>
-                      <p>
-                        Please Check
-                        <span className="text-primary ms-1">@rev</span>
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">24 Jul 2024</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-heart-filled text-warning me-2" />
-                        <span className="count-message fs-12 fw-semibold">
-                          25
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-07.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Scholars Society</h6>
-                      <p className="text-danger">
-                        <i className="ti ti-video-off me-2" />
-                        Missed Video Call
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-heart-filled text-warning me-2" />
-                        <i className="ti ti-checks text-success" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-08.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Travel Tribe</h6>
-                      <p>Hi How are you</p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <span className="count-message fs-12 fw-semibold">
-                          25
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-09.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Fitness Fanatics</h6>
-                      <p>Do you know which...</p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-heart-filled text-warning" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-10.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>The Quest Crew</h6>
-                      <p>Haha oh man</p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-pin me-2" />
-                        <i className="ti ti-checks text-success" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-11.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Game Changers</h6>
-                      <p>
-                        <i className="ti ti-map-pin-plus me-2" />
-                        Location
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-checks text-success" />
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <div className="chat-list">
-                <Link to={routes.groupChat} className="chat-user-list">
-                  <div className="avatar avatar-lg online me-2">
-                    <ImageWithBasePath
-                      src="assets/img/groups/group-12.jpg"
-                      className="rounded-circle"
-                      alt="image"
-                    />
-                  </div>
-                  <div className="chat-user-info">
-                    <div className="chat-user-msg">
-                      <h6>Movie Buffs</h6>
-                      <p>
-                        <i className="ti ti-video me-2" />
-                        Video
-                      </p>
-                    </div>
-                    <div className="chat-user-time">
-                      <span className="time">02:40 PM</span>
-                      <div className="chat-pin">
-                        <i className="ti ti-heart-filled text-warning me-2" />
-                        <span className="count-message fs-12 fw-semibold">
-                          25
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </Link>
-                <div className="chat-dropdown">
-                  <Link className="#" to="#" data-bs-toggle="dropdown">
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-box-align-right me-2" />
-                        Archive Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-volume-off me-2" />
-                        Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-logout-2 me-2" />
-                        Exit Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-pinned me-2" />
-                        Pin Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link className="dropdown-item" to="#">
-                        <i className="ti ti-square-check me-2" />
-                        Mark as Unread
-                      </Link>
-                    </li>
-                  </ul>
-                </div>
+                ) : (
+                  filteredGroups.map(renderGroupItem)
+                )}
               </div>
             </div>
           </div>
-        </div> {/* <-- Add this closing div for 'slimscroll' */}
         </OverlayScrollbarsComponent>
       </div>
-      {/* / Chats sidebar */}
+      {/* / Groups sidebar */}
     </>
   );
 };

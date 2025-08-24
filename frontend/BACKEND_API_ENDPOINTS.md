@@ -28,6 +28,30 @@ DELETE /messages/{id}                    # Delete message
 POST   /messages/{id}/forward            # Forward message to other users
 ```
 
+### **Group Chat Endpoints** 🔄 (Need to implement)
+
+#### **Groups**
+```python
+GET    /groups                           # Get all groups for current user
+POST   /groups                           # Create new group
+GET    /groups/{id}                      # Get group information
+PUT    /groups/{id}                      # Update group information
+DELETE /groups/{id}                      # Delete group (admin only)
+POST   /groups/{id}/members              # Add members to group
+DELETE /groups/{id}/members              # Remove members from group
+DELETE /groups/{id}/leave                # Leave group
+```
+
+#### **Group Messages**
+```python
+GET    /groups/{id}/messages             # Get messages for specific group
+POST   /groups/messages                  # Send message to group
+DELETE /groups/messages/{id}             # Delete group message
+PUT    /groups/{id}/read                 # Mark group messages as read
+GET    /groups/{id}/messages/search      # Search group messages
+POST   /groups/upload                    # Upload file for group
+```
+
 #### **File Upload**
 ```python
 POST   /upload                           # Upload files (images, documents, etc.)
@@ -152,6 +176,95 @@ Response:
 }
 ```
 
+### **6. Get Group Information**
+```python
+# GET /groups/{id}
+Response:
+{
+  "id": "group_123",
+  "name": "The Dream Team",
+  "description": "Our awesome team chat",
+  "avatar_url": "https://example.com/groups/dream-team.jpg",
+  "member_count": 40,
+  "online_count": 24,
+  "online_members": [
+    {
+      "id": "user_1",
+      "username": "john_doe",
+      "full_name": "John Doe",
+      "avatar_url": "https://example.com/avatars/john.jpg",
+      "is_online": true,
+      "last_seen": "2024-01-15T10:30:00Z",
+      "role": "admin"
+    }
+  ],
+  "created_at": "2024-01-15T10:30:00Z",
+  "updated_at": "2024-01-15T10:30:00Z"
+}
+```
+
+### **7. Get Group Messages**
+```python
+# GET /groups/{id}/messages?page=1&limit=50
+Response:
+{
+  "messages": [
+    {
+      "id": "msg_123",
+      "content": "Hello everyone!",
+      "sender_id": "user_1",
+      "sender_name": "John Doe",
+      "sender_avatar": "https://example.com/avatars/john.jpg",
+      "group_id": "group_123",
+      "message_type": "text",
+      "timestamp": "2024-01-15T10:30:00Z",
+      "is_read": true,
+      "reply_to": null
+    },
+    {
+      "id": "msg_124",
+      "content": "project.zip",
+      "sender_id": "user_2",
+      "sender_name": "Jane Smith",
+      "sender_avatar": "https://example.com/avatars/jane.jpg",
+      "group_id": "group_123",
+      "message_type": "file",
+      "timestamp": "2024-01-15T10:31:00Z",
+      "is_read": false,
+      "file_url": "https://example.com/files/project.zip",
+      "file_name": "project.zip",
+      "file_size": 2048000
+    }
+  ]
+}
+```
+
+### **8. Send Group Message**
+```python
+# POST /groups/messages
+Request (FormData):
+{
+  "group_id": "group_123",
+  "content": "Hello everyone!",
+  "message_type": "text",
+  "reply_to": "msg_123",  # optional
+  "file": <file>          # optional
+}
+
+Response:
+{
+  "id": "msg_125",
+  "content": "Hello everyone!",
+  "sender_id": "user_1",
+  "sender_name": "John Doe",
+  "sender_avatar": "https://example.com/avatars/john.jpg",
+  "group_id": "group_123",
+  "message_type": "text",
+  "timestamp": "2024-01-15T10:32:00Z",
+  "is_read": false
+}
+```
+
 ## 🗄️ Database Schema Suggestions
 
 ### **Users Table**
@@ -186,11 +299,36 @@ CREATE TABLE conversation_participants (
 );
 ```
 
+### **Groups Table**
+```sql
+CREATE TABLE groups (
+    id UUID PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    avatar_url TEXT,
+    created_by UUID REFERENCES users(id),
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+```
+
+### **Group Members Table**
+```sql
+CREATE TABLE group_members (
+    group_id UUID REFERENCES groups(id),
+    user_id UUID REFERENCES users(id),
+    role VARCHAR(20) DEFAULT 'member', -- 'admin' or 'member'
+    joined_at TIMESTAMP DEFAULT NOW(),
+    PRIMARY KEY (group_id, user_id)
+);
+```
+
 ### **Messages Table**
 ```sql
 CREATE TABLE messages (
     id UUID PRIMARY KEY,
     conversation_id UUID REFERENCES conversations(id),
+    group_id UUID REFERENCES groups(id), -- NULL for direct messages, not NULL for group messages
     sender_id UUID REFERENCES users(id),
     content TEXT NOT NULL,
     message_type VARCHAR(20) DEFAULT 'text',
@@ -247,17 +385,25 @@ async def websocket_endpoint(websocket: WebSocket, user_id: str):
 2. `GET /conversations/{id}/messages` - Get messages
 3. `POST /messages` - Send message
 4. `PUT /conversations/{id}/read` - Mark as read
+5. `GET /groups` - List groups
+6. `GET /groups/{id}/messages` - Get group messages
+7. `POST /groups/messages` - Send group message
 
 ### **Phase 2 (Important)**
 1. `POST /upload` - File upload
 2. `DELETE /messages/{id}` - Delete message
 3. `GET /users/{id}` - User profiles
+4. `POST /groups` - Create group
+5. `PUT /groups/{id}` - Update group
+6. `POST /groups/{id}/members` - Add members
 
 ### **Phase 3 (Advanced)**
 1. `POST /messages/{id}/forward` - Forward messages
 2. `GET /conversations/search` - Search conversations
 3. `PUT /users/{id}/block` - Block users
-4. WebSocket support for real-time messaging
+4. `DELETE /groups/{id}` - Delete group
+5. `DELETE /groups/{id}/members` - Remove members
+6. WebSocket support for real-time messaging
 
 ## 🧪 Testing Endpoints
 
