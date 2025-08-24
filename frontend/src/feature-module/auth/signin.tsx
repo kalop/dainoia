@@ -170,7 +170,7 @@ const Signin = () => {
                     </div>
                     <div className="mt-5 text-center">
                       <p className="mb-0 text-gray-9">
-                        Don’t have a account?{" "}
+                        Don't have a account?{" "}
                         <Link to={routes.signup} className="link-primary">
                           Sign Up
                         </Link>

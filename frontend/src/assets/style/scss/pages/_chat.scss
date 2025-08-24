@@ -422,16 +422,29 @@
             height: calc(100vh - 95px) !important;
         }
     }
-    .chat-body {
-        flex: 1;
-        padding: 16px 16px 90px;
+         .chat-body {
+         flex: 1;
+         padding: 16px 16px 120px;
         .messages {       
             display: flex;
             display: -webkit-flex;
             flex-direction: column;
             -webkit-flex-direction: column;
             align-items: flex-start;
-            -webkit-align-items: flex-start;                 
+            -webkit-align-items: flex-start;
+            
+            .empty-chat-state {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: 100%;
+                min-height: 60vh;
+                flex-direction: column;
+                
+                .text-center {
+                    max-width: 300px;
+                }
+            }                 
             .chat-profile-name {
                 h6 {
                     display: flex;
@@ -1054,23 +1067,22 @@
     -ms-transform: translate(0, -50%);
     transform: translate(0, -50%);
 }
-.chat .chat-footer {
-	position: relative;
-    .footer-form {
-        display: flex;
-        flex-direction: column;
-        align-items: start !important;
-        display: -webkit-flex;
-        align-items: end;
-        -webkit-align-items: end;
-        position: absolute;
-        bottom: 0px;
-        left: 0;
-        right: 0;
-        padding: 24px;
-        background-color: variables.$white;
-        border-top: 1px solid variables.$border-color;
-        padding: 10px 16px;
+ .chat .chat-footer {
+ 	position: fixed;
+     bottom: 0;
+     left: 0;
+     right: 0;
+     background-color: variables.$white;
+     border-top: 1px solid variables.$border-color;
+     z-index: 1000;
+     .footer-form {
+         display: flex;
+         flex-direction: column;
+         align-items: start !important;
+         display: -webkit-flex;
+         align-items: end;
+         -webkit-align-items: end;
+         padding: 10px 16px;
         .chat-footer-wrap {
             display: flex;
             display: -webkit-flex;
