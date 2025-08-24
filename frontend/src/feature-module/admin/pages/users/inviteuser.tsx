@@ -1,4 +1,4 @@
-import React from 'react'
+
 import UserModal from '../../common/modals/userModal'
 import ImageWithBasePath from '../../../../core/common/imageWithBasePath'
 import { Link } from 'react-router-dom'

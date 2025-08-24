@@ -1,4 +1,4 @@
-import React from 'react'
+
 import ImageWithBasePath from '../../../core/common/imageWithBasePath'
 import { AlertOctagon, Check, Info, Plus, X } from 'react-feather'
 

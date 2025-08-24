@@ -1,7 +1,8 @@
 // index.tsx
 import React, { useEffect, useState } from "react";
 import { Table } from "antd";
-import { DatatableProps } from "../../core/data/interface"; // Ensure correct path
+import type { DatatableProps } from "../../core/data/interface"; // Ensure correct path
+ // Ensure correct path
 
 
 const Datatable: React.FC<DatatableProps> = ({ columns, dataSource , Selection }) => {

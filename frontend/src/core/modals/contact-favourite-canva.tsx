@@ -1,4 +1,4 @@
-import React from 'react'
+
 import ImageWithBasePath from '../common/imageWithBasePath'
 import { Link } from 'react-router-dom'
 

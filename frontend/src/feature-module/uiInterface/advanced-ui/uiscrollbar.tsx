@@ -1,5 +1,6 @@
-import React from "react";
-import Scrollbars from "react-custom-scrollbars-2";
+
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 import { Link } from "react-router-dom";
 
 const Scrollbar = () => {
@@ -29,9 +30,14 @@ const Scrollbar = () => {
               </div>
               <div className="card-body">
                 <div className="scroll-bar-wrap">
-                  <Scrollbars
+                  <OverlayScrollbarsComponent
+                    options={{
+                      scrollbars: {
+                        autoHide: 'scroll',
+                        autoHideDelay: 1000,
+                      },
+                    }}
                     style={{ width: "100%", height: "300px" }}
-                    autoHide
                   >
                     <div className="horizontal-scroll scroll-demo">
                       <div
@@ -43,14 +49,14 @@ const Scrollbar = () => {
                             <p>
                               Lorem Ipsum is simply dummy text of the printing
                               and typesetting industry. Lorem Ipsum has been the
-                              industry&apos;s standard dummy text ever since the
+                              industry's standard dummy text ever since the
                               1500s, when an unknown printer took a galley of
                               type and scrambled it to make a type specimen
                               book. It has survived not only five centuries, but
                               also the leap into electronic typesetting,
                               remaining essentially unchanged.Lorem Ipsum is
                               simply dummy text of the printing and typesetting
-                              industry. Lorem Ipsum has been the industry&apos;s
+                              industry. Lorem Ipsum has been the industry's
                               standard dummy text ever since the 1500s, when an
                               unknown printer took a galley of type and
                               scrambled it to make a type specimen book. It has
@@ -94,7 +100,7 @@ const Scrollbar = () => {
                               when looking at its layout. The point of using
                               Lorem Ipsum is that it has a more-or-less normal
                               distribution of letters, as opposed to using
-                              &apos;Content here, content here&apos;, making it
+                              'Content here, content here', making it
                               look like readable English. Many desktop
                               publishing packages and web page editors.It was
                               popularised in the 1960s with the release of
@@ -107,7 +113,7 @@ const Scrollbar = () => {
                         </div>
                       </div>
                     </div>
-                  </Scrollbars>
+                  </OverlayScrollbarsComponent>
                 </div>
               </div>
             </div>
@@ -120,12 +126,20 @@ const Scrollbar = () => {
                 <h5 className="card-title">Vertical Scroll</h5>
               </div>
               <div className="card-body" style={{ height: "300px" }}>
-                <Scrollbars style={{ width: "100%", height: "100%" }}>
+                <OverlayScrollbarsComponent
+                  style={{ width: "100%", height: "100%" }}
+                  options={{
+                    scrollbars: {
+                      autoHide: 'scroll',
+                      autoHideDelay: 1000,
+                    },
+                  }}
+                >
                   <div className="vertical-scroll scroll-demo">
                     <p>
                       Lorem Ipsum is simply dummy text of the printing and
                       typesetting industry. Lorem Ipsum has been the
-                      industry&apos;s standard dummy text ever since the 1500s,
+                      industry's standard dummy text ever since the 1500s,
                       when an unknown printer took a galley of type and
                       scrambled it to make a type specimen book. It has survived
                       not only five centuries, but also the leap into electronic
@@ -150,7 +164,7 @@ const Scrollbar = () => {
                       distracted by the readable content of a page when looking
                       at its layout. The point of using Lorem Ipsum is that it
                       has a more-or-less normal distribution of letters, as
-                      opposed to using &apos;Content here, content here&apos;,
+                      opposed to using 'Content here, content here',
                       making it look like readable English. Many desktop
                       publishing packages and web page editors.
                     </p>
@@ -163,7 +177,7 @@ const Scrollbar = () => {
                       et dolorum fuga.
                     </p>
                   </div>
-                </Scrollbars>
+                </OverlayScrollbarsComponent>
               </div>
             </div>
           </div>
@@ -175,12 +189,20 @@ const Scrollbar = () => {
                 <h5 className="card-title">Small Size Scroll</h5>
               </div>
               <div className="card-body" style={{ height: "300px" }}>
-                <Scrollbars style={{ width: "100%", height: "80%" }}>
+                <OverlayScrollbarsComponent
+                  style={{ width: "100%", height: "80%" }}
+                  options={{
+                    scrollbars: {
+                      autoHide: 'scroll',
+                      autoHideDelay: 1000,
+                    },
+                  }}
+                >
                   <div className="scrollbar-margins large-margin scroll-demo">
                     <p>
                       Lorem Ipsum is simply dummy text of the printing and
                       typesetting industry. Lorem Ipsum has been the
-                      industry&apos;s standard dummy text ever since the 1500s,
+                      industry's standard dummy text ever since the 1500s,
                       when an unknown printer took a galley of type and
                       scrambled it to make a type specimen book. It has survived
                       not only five centuries, but also the leap into electronic
@@ -205,7 +227,7 @@ const Scrollbar = () => {
                       distracted by the readable content of a page when looking
                       at its layout. The point of using Lorem Ipsum is that it
                       has a more-or-less normal distribution of letters, as
-                      opposed to using &apos;Content here, content here&apos;,
+                      opposed to using 'Content here, content here',
                       making it look like readable English. Many desktop
                       publishing packages and web page editors.
                     </p>
@@ -218,7 +240,7 @@ const Scrollbar = () => {
                       et dolorum fuga.
                     </p>
                   </div>
-                </Scrollbars>
+                </OverlayScrollbarsComponent>
               </div>
             </div>
           </div>
@@ -231,9 +253,14 @@ const Scrollbar = () => {
               </div>
               <div className="card-body">
                 <div className="scroll-bar-wrap">
-                  <Scrollbars
+                  <OverlayScrollbarsComponent
+                    options={{
+                      scrollbars: {
+                        autoHide: 'scroll',
+                        autoHideDelay: 1000,
+                      },
+                    }}
                     style={{ width: "100%", height: "300px" }}
-                    autoHide
                   >
                     <div className="visible-scroll always-visible scroll-demo">
                       <div
@@ -245,7 +272,7 @@ const Scrollbar = () => {
                             <p>
                               Lorem Ipsum is simply dummy text of the printing
                               and typesetting industry. Lorem Ipsum has been the
-                              industry&apos;s standard dummy text ever since the
+                              industry's standard dummy text ever since the
                               1500s, when an unknown printer took a galley of
                               type and scrambled it to make a type specimen
                               book. It has survived not only five centuries, but
@@ -283,7 +310,7 @@ const Scrollbar = () => {
                               when looking at its layout. The point of using
                               Lorem Ipsum is that it has a more-or-less normal
                               distribution of letters, as opposed to using
-                              &apos;Content here, content here&apos;, making it
+                              'Content here, content here', making it
                               look like readable English. Many desktop
                               publishing packages and web page editors.
                             </p>
@@ -301,7 +328,7 @@ const Scrollbar = () => {
                             <p>
                               Lorem Ipsum is simply dummy text of the printing
                               and typesetting industry. Lorem Ipsum has been the
-                              industry&apos;s standard dummy text ever since the
+                              industry's standard dummy text ever since the
                               1500s, when an unknown printer took a galley of
                               type and scrambled it to make a type specimen
                               book. It has survived not only five centuries, but
@@ -339,7 +366,7 @@ const Scrollbar = () => {
                               when looking at its layout. The point of using
                               Lorem Ipsum is that it has a more-or-less normal
                               distribution of letters, as opposed to using
-                              &apos;Content here, content here&apos;, making it
+                              'Content here, content here', making it
                               look like readable English. Many desktop
                               publishing packages and web page editors.
                             </p>
@@ -356,7 +383,7 @@ const Scrollbar = () => {
                         </div>
                       </div>
                     </div>
-                  </Scrollbars>
+                  </OverlayScrollbarsComponent>
                 </div>
               </div>
             </div>

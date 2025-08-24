@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import ImageWithBasePath from "../imageWithBasePath";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { all_routes } from "../../../feature-module/router/all_routes";
-import OverlayTrigger from "react-bootstrap/OverlayTrigger";
 import { Tooltip } from "antd";
 import { setDark } from "../../data/redux/commonSlice";
 

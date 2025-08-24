@@ -1,8 +1,8 @@
-import React from "react";
+
 import { Link } from "react-router-dom";
 import { all_routes } from "../../router/all_routes";
 import Table from "../../admin/common/dataTable/index";
-import { TableData } from "../../../core/data/interface";
+import type { TableData } from "../../../core/data/interface";
 import { datatable } from "../../admin/core/data/json/datatable";
 const DataTables = () => {
   const routes = all_routes;

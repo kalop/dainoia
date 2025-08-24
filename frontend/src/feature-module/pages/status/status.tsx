@@ -1,4 +1,4 @@
-import React from 'react'
+
 import UploadFile from '../../../core/modals/upload-file-image'
 import NewStatus from '../../../core/modals/new-status'
 import { Link } from 'react-router-dom'

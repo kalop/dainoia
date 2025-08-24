@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import  { useEffect } from 'react'
 // import '../../../style/icon/themify/themify.css'
 
 
@@ -6,7 +6,7 @@ const ThemifyIcons = () => {
   useEffect(() => {
     const loadCSS = async () => {
       // Dynamically import the CSS file
-      await import('../../../style/icon/themify/themify.css');
+      await import('../../../assets/style/icon/themify/themify.css');
     };
 
     loadCSS();

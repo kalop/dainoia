@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ImageWithBasePath from '../../core/common/imageWithBasePath'
 import { Link } from 'react-router-dom'
 import { all_routes } from '../router/all_routes'

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { Link } from 'react-router-dom'
 import VideoModal from '../hooks/video-modal';
 import Lightbox from "yet-another-react-lightbox";
@@ -176,19 +176,19 @@ const ContactInfo = () => {
                           close={() => setOpen1(false)}
                           slides={[
                             {
-                              src: "/assets/img/gallery/gallery-02.jpg",
+                              src: "/react/template/assets/img/gallery/gallery-02.jpg",
                             },
                             {
-                              src: "/assets/img/gallery/gallery-03.jpg",
+                              src: "/react/template/assets/img/gallery/gallery-03.jpg",
                             },
                             {
-                              src: "/assets/img/gallery/gallery-01.jpg",
+                              src: "/react/template/assets/img/gallery/gallery-01.jpg",
                             },
                             {
-                              src: "/assets/img/gallery/gallery-04.jpg",
+                              src: "/react/template/assets/img/gallery/gallery-04.jpg",
                             },
                             {
-                              src: "/assets/img/gallery/gallery-05.jpg",
+                              src: "/react/template/assets/img/gallery/gallery-05.jpg",
                             },
                           ]}
                         />

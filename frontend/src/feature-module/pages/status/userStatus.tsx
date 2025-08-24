@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import  { useEffect } from 'react'
 import ImageWithBasePath from '../../../core/common/imageWithBasePath'
 import { Link } from 'react-router-dom'
 import UploadFile from '../../../core/modals/upload-file-image'

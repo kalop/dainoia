@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import ReactStarsRating from "react-awesome-stars-rating";
 import { RotateCcw } from "react-feather";
 import { Link } from "react-router-dom";

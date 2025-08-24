@@ -1,4 +1,4 @@
-import React from 'react'
+
 import GroupInfo from './group-info'
 import MessageInfo from './message-info'
 import GroupSettings from './group-settings'

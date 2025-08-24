@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Smile } from 'react-feather'
 
 const Colors = () => {

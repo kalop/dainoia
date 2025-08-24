@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import ImageWithBasePath from '../../../../core/common/imageWithBasePath'
 import ReactApexChart from "react-apexcharts";
 import { Link } from 'react-router-dom';

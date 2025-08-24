@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import  { useState } from "react";
 
 import { Chart } from "primereact/chart";
 import { useEffect } from "react";

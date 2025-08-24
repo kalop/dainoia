@@ -1,4 +1,4 @@
-import React from 'react'
+
 import NewChat from './newChat'
 import DeleteAccount from './delete-account'
 import DeleteChat from './delete-chat'

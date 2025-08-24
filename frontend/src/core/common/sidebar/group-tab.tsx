@@ -1,8 +1,9 @@
-import React from "react";
+
 import ImageWithBasePath from "../imageWithBasePath";
 import { Link } from "react-router-dom";
 import { all_routes } from "../../../feature-module/router/all_routes";
-import Scrollbars from "react-custom-scrollbars-2";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 
 const GroupTab = () => {
   const routes = all_routes;
@@ -10,16 +11,14 @@ const GroupTab = () => {
     <>
       {/* Chats sidebar */}
       <div className="sidebar-content active slimscroll">
-      <Scrollbars
-            autoHide
-            autoHideTimeout={1000}
-            autoHideDuration={200}
-            autoHeight
-            autoHeightMin={0}
-            autoHeightMax='100vh'
-            thumbMinSize={30}
-            universal={false}
-            hideTracksWhenNotNeeded={true}
+      <OverlayScrollbarsComponent
+            options={{
+              scrollbars: {
+                autoHide: 'scroll',
+                autoHideDelay: 1000,
+              },
+            }}
+            style={{ maxHeight: '100vh' }}
           >
         <div className="slimscroll">
           <div className="chat-search-header">
@@ -970,8 +969,8 @@ const GroupTab = () => {
               </div>
             </div>
           </div>
-        </div>
-        </Scrollbars>
+        </div> {/* <-- Add this closing div for 'slimscroll' */}
+        </OverlayScrollbarsComponent>
       </div>
       {/* / Chats sidebar */}
     </>

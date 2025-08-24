@@ -1,4 +1,4 @@
-import React from "react";
+
 import ChatTab from "./chat-tab";
 import ContactTab from "./contact-tab";
 import GroupTab from "./group-tab";

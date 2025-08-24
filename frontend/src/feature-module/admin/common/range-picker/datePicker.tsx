@@ -1,61 +1,102 @@
-import React, { useState } from 'react';
-import { DateRangePicker } from 'react-bootstrap-daterangepicker';
-import moment from 'moment';
-import 'bootstrap-daterangepicker/daterangepicker.css';
+import React, { useState, useRef } from 'react';
+import { DatePicker, Dropdown, Menu, Input } from 'antd';
+import dayjs from 'dayjs';
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
+import localeData from 'dayjs/plugin/localeData';
+
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isSameOrAfter);
+dayjs.extend(customParseFormat);
+dayjs.extend(localeData);
+
+const { RangePicker } = DatePicker;
+const dateFormat = 'YYYY/MM/DD';
 
 const PredefinedDateRanges: React.FC = () => {
-  const [state, setState] = useState({
-    start: moment().subtract(29, 'days'),
-    end: moment(),
-  });
+  const [dates, setDates] = useState<[dayjs.Dayjs, dayjs.Dayjs]>([
+    dayjs().subtract(6, 'days'),
+    dayjs(),
+  ]);
+  const [customVisible, setCustomVisible] = useState(false);
+  const rangeRef = useRef<any>(null);
 
-  const { start, end } = state;
-
-  const handleCallback = (start: moment.Moment, end: moment.Moment) => {
-    setState({ start, end });
+  const predefinedRanges: Record<string, [dayjs.Dayjs, dayjs.Dayjs]> = {
+    Today: [dayjs(), dayjs()],
+    Yesterday: [dayjs().subtract(1, 'day'), dayjs().subtract(1, 'day')],
+    'Last 7 Days': [dayjs().subtract(6, 'day'), dayjs()],
+    'Last 30 Days': [dayjs().subtract(29, 'day'), dayjs()],
+    'This Month': [dayjs().startOf('month'), dayjs().endOf('month')],
+    'Last Month': [
+      dayjs().subtract(1, 'month').startOf('month'),
+      dayjs().subtract(1, 'month').endOf('month'),
+    ],
   };
 
-  // Format to "MM/DD/YYYY"
-  const label = `${start.format('MM/DD/YYYY')} - ${end.format('MM/DD/YYYY')}`;
+  const handleMenuClick = ({ key }: { key: string }) => {
+    if (key === 'Custom Range') {
+      setCustomVisible(true);
+      // Trigger calendar popup manually
+      setTimeout(() => rangeRef.current?.focus(), 0);
+    } else {
+      setDates(predefinedRanges[key]);
+      setCustomVisible(false);
+    }
+  };
+
+  const handleCustomChange = (value: any) => {
+    if (value) {
+      setDates(value);
+      setCustomVisible(false);
+    }
+  };
+
+  const menu = (
+    <Menu
+      onClick={handleMenuClick}
+      items={[
+        ...Object.keys(predefinedRanges).map(label => ({
+          key: label,
+          label,
+        })),
+        { type: 'divider' },
+        { key: 'Custom Range', label: 'Custom Range' },
+      ]}
+    />
+  );
+
+  const displayValue = `${dates[0].format(dateFormat)} - ${dates[1].format(dateFormat)}`;
 
   return (
-    <DateRangePicker
-      initialSettings={{
-        startDate: start.toDate(),
-        endDate: end.toDate(),
-        ranges: {
-          Today: [moment().toDate(), moment().toDate()],
-          Yesterday: [moment().subtract(1, 'days').toDate(), moment().subtract(1, 'days').toDate()],
-          'Last 7 Days': [moment().subtract(6, 'days').toDate(), moment().toDate()],
-          'Last 30 Days': [moment().subtract(29, 'days').toDate(), moment().toDate()],
-          'This Month': [moment().startOf('month').toDate(), moment().endOf('month').toDate()],
-          'Last Month': [
-            moment().subtract(1, 'month').startOf('month').toDate(),
-            moment().subtract(1, 'month').endOf('month').toDate(),
-          ],
-        },
-      }}
-      onCallback={handleCallback}
-    >
-      <div
-        id="reportrange"
-        className="col-4"
-        style={{
-          background: '#fff',
-          cursor: 'pointer',
-          padding: '0.5rem 0.625rem',
-          border: '1px solid #E9EDF4',
-          width: '100%',
-          borderRadius: '5px',
-          fontSize: '14px',
-          color: '#202C4B',
-          height: '38px',
-        }}
-      >
-        <i className="ti ti-calendar"></i>&nbsp;
-        <span>{label}</span>
-      </div>
-    </DateRangePicker>
+    <div>
+      <span className="icon-addon">
+									<i className="ti ti-calendar"></i>
+								</span>
+      <Dropdown overlay={menu} trigger={['click']}>
+        <Input
+          readOnly
+          value={displayValue}
+          className="form-control date-range bookingrange"
+        />
+      </Dropdown>
+
+      {/* Hidden RangePicker - purely for calendar popup */}
+      {customVisible && (
+        <RangePicker
+          open
+          ref={rangeRef}
+          onChange={handleCustomChange}
+          format={dateFormat}
+          value={dates}
+          allowClear={false}
+          style={{ position: 'absolute', top: 0, left: 0, opacity: 0, pointerEvents: 'none' }}
+          onOpenChange={(open) => {
+            if (!open) setCustomVisible(false);
+          }}
+        />
+      )}
+    </div>
   );
 };
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import ImageWithBasePath from "../../../core/common/imageWithBasePath";
 import Lightbox from "yet-another-react-lightbox";
@@ -7,7 +7,8 @@ import {Tooltip} from "antd";
 import CommonGroupModal from "../../../core/modals/common-group-modal";
 import { all_routes } from "../../router/all_routes";
 import ForwardMessage from "../../../core/modals/forward-message";
-import Scrollbars from "react-custom-scrollbars-2";
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 
 const GroupChat = () => {
   const [open1, setOpen1] = useState(false);
@@ -238,16 +239,14 @@ const GroupChat = () => {
               </div>
               {/* /Chat Search */}
             </div>
-            <Scrollbars
-              autoHide
-              autoHideTimeout={1000}
-              autoHideDuration={200}
-              autoHeight
-              autoHeightMin={0}
-              autoHeightMax="88vh"
-              thumbMinSize={30}
-              universal={false}
-              hideTracksWhenNotNeeded={true}
+            <OverlayScrollbarsComponent
+              options={{
+                scrollbars: {
+                  autoHide: 'scroll',
+                  autoHideDelay: 1000,
+                },
+              }}
+              style={{ maxHeight: '88vh' }}
             >
               <div className="chat-body chat-page-group ">
                 <div className="messages">
@@ -1021,19 +1020,19 @@ const GroupChat = () => {
                               close={() => setOpen1(false)}
                               slides={[
                                 {
-                                  src: "/assets/img/gallery/gallery-02.jpg",
+                                  src: "/react/template/assets/img/gallery/gallery-02.jpg",
                                 },
                                 {
-                                  src: "/assets/img/gallery/gallery-03.jpg",
+                                  src: "/react/template/assets/img/gallery/gallery-03.jpg",
                                 },
                                 {
-                                  src: "/assets/img/gallery/gallery-01.jpg",
+                                  src: "/react/template/assets/img/gallery/gallery-01.jpg",
                                 },
                                 {
-                                  src: "/assets/img/gallery/gallery-04.jpg",
+                                  src: "/react/template/assets/img/gallery/gallery-04.jpg",
                                 },
                                 {
-                                  src: "/assets/img/gallery/gallery-05.jpg",
+                                  src: "/react/template/assets/img/gallery/gallery-05.jpg",
                                 },
                               ]}
                             />
@@ -2512,7 +2511,7 @@ const GroupChat = () => {
                   </div>
                 </div>
               </div>
-            </Scrollbars>
+            </OverlayScrollbarsComponent>
           </div>
           <div className="chat-footer">
             <form className="footer-form">

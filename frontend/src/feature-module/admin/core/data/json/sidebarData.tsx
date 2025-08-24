@@ -1,7 +1,6 @@
 import { all_routes } from "../../../../router/all_routes";
 const route = all_routes;
 export const SidebarData = [
- 
   {
     label: "Main",
     icon: "ti ti-page-break",
@@ -19,21 +18,37 @@ export const SidebarData = [
         icon: "ti ti-user",
         submenu: true,
         submenuItems: [
-          { label: "Users List", link: route.users,icon:"ti ti-point-filled me-2" },
-          { label: "Blocked Users", link: route.blockuser,icon:"ti ti-point-filled me-2" },
-          { label: "Reported Users", link: route.reportuser,icon:"ti ti-point-filled me-2" },
-          { label: "Invited Users", link: route.inviteuser,icon:"ti ti-point-filled me-2" },
+          {
+            label: "Users List",
+            link: route.users,
+            icon: "ti ti-point-filled me-2",
+          },
+          {
+            label: "Blocked Users",
+            link: route.blockuser,
+            icon: "ti ti-point-filled me-2",
+          },
+          {
+            label: "Reported Users",
+            link: route.reportuser,
+            icon: "ti ti-point-filled me-2",
+          },
+          {
+            label: "Invited Users",
+            link: route.inviteuser,
+            icon: "ti ti-point-filled me-2",
+          },
         ],
       },
       {
         label: "Group",
-        link:route.group,
+        link: route.group,
         showSubRoute: false,
         icon: "ti ti-users-group",
       },
       {
         label: "Chat",
-        link:route.chats,
+        link: route.chats,
         showSubRoute: false,
         icon: "ti ti-message-circle",
       },
@@ -45,7 +60,7 @@ export const SidebarData = [
       },
       {
         label: "Abuse Messages",
-        link:route.abusemessage,
+        link: route.abusemessage,
         showSubRoute: false,
         icon: "ti ti-message-report",
       },
@@ -61,10 +76,8 @@ export const SidebarData = [
         showSubRoute: false,
         icon: "ti ti-settings",
       },
-     
     ],
   },
-
 
   {
     label: "UI Interface",
@@ -96,13 +109,13 @@ export const SidebarData = [
           { label: "Dropdowns", link: route.dropdowns, showSubRoute: false },
           { label: "Grid", link: route.grid, showSubRoute: false },
           { label: "Images", link: route.images, showSubRoute: false },
-          { label: "Lightbox", link:route.lightbox, showSubRoute: false },
+          { label: "Lightbox", link: route.lightbox, showSubRoute: false },
           { label: "Media", link: route.media, showSubRoute: false },
           { label: "Modals", link: route.modals, showSubRoute: false },
           { label: "Offcanvas", link: route.offcanvas, showSubRoute: false },
           { label: "Pagination", link: route.pagination, showSubRoute: false },
           { label: "Popovers", link: route.popover, showSubRoute: false },
-          { label: "Progress", link:route.progress, showSubRoute: false },
+          { label: "Progress", link: route.progress, showSubRoute: false },
           {
             label: "Placeholders",
             link: route.placeholder,
@@ -134,7 +147,11 @@ export const SidebarData = [
         submenuItems: [
           { label: "Ribbon", link: route.ribbon, showSubRoute: false },
           { label: "Clipboard", link: route.clipboard, showSubRoute: false },
-          { label: "Drag & Drop", link: route.dragandDrop, showSubRoute: false },
+          {
+            label: "Drag & Drop",
+            link: route.dragandDrop,
+            showSubRoute: false,
+          },
           {
             label: "Range Slider",
             link: route.rangeSlider,
@@ -148,7 +165,11 @@ export const SidebarData = [
           },
           { label: "Counter", link: route.counter, showSubRoute: false },
           { label: "Scrollbar", link: route.scrollBar, showSubRoute: false },
-          { label: "Sticky Note", link:  route.stickyNotes, showSubRoute: false },
+          {
+            label: "Sticky Note",
+            link: route.stickyNotes,
+            showSubRoute: false,
+          },
           { label: "Timeline", link: route.timeLine, showSubRoute: false },
         ],
       },
@@ -232,20 +253,24 @@ export const SidebarData = [
               },
               {
                 label: "Input Groups",
-                link:  route.inputGroup,
+                link: route.inputGroup,
                 showSubRoute: false,
               },
               {
                 label: "Grid & Gutters",
-                link:  route.gridandGutters,
+                link: route.gridandGutters,
                 showSubRoute: false,
               },
               {
                 label: "Form Select",
-                link:  route.formSelect,
+                link: route.formSelect,
                 showSubRoute: false,
               },
-              { label: "Input Masks", link: route.formMask, showSubRoute: false },
+              {
+                label: "Input Masks",
+                link: route.formMask,
+                showSubRoute: false,
+              },
               {
                 label: "File Uploads",
                 link: route.fileUpload,
@@ -292,15 +317,14 @@ export const SidebarData = [
         link: "#",
         icon: "ti ti-file-text",
         showSubRoute: false,
-        version:"4.0.2",
-        vshow:true
       },
       {
         label: "Changelog",
         link: "#",
         icon: "ti ti ti-exchange",
+        version: "2.8.1",
         showSubRoute: false,
-
+        vshow: true,
       },
       {
         label: "Multi Level",

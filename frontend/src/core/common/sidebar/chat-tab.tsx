@@ -1,12 +1,13 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import ImageWithBasePath from '../imageWithBasePath'
 import { Link } from 'react-router-dom'
 import { all_routes } from '../../../feature-module/router/all_routes'
-import Scrollbars from 'react-custom-scrollbars-2'
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
 import { Swiper, SwiperSlide } from 'swiper/react';
 
 // Import Swiper styles
-import 'swiper/css';
+import '../../../../node_modules/swiper/swiper.css';
+import "overlayscrollbars/overlayscrollbars.css";
 const ChatTab = () => {
     const routes = all_routes;
     const [activeTab,setActiveTab] = useState('All Chats')
@@ -14,16 +15,14 @@ const ChatTab = () => {
     <>
         {/* Chats sidebar */}
         <div id="chats" className="sidebar-content active ">
-        <Scrollbars
-            autoHide
-            autoHideTimeout={1000}
-            autoHideDuration={200}
-            autoHeight
-            autoHeightMin={0}
-            autoHeightMax='100vh'
-            thumbMinSize={30}
-            universal={false}
-            hideTracksWhenNotNeeded={true}
+        <OverlayScrollbarsComponent
+            options={{
+              scrollbars: {
+                autoHide: 'scroll',
+                autoHideDelay: 1000,
+              },
+            }}
+            style={{ maxHeight: '100vh' }}
           >
           <div className="">
             <div className="chat-search-header">
@@ -5141,7 +5140,7 @@ const ChatTab = () => {
               </div>
             </div>
           </div>
-          </Scrollbars>
+          </OverlayScrollbarsComponent>
         </div>
         {/* / Chats sidebar */}
     </>

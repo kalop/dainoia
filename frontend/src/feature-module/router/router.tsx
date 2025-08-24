@@ -4,7 +4,7 @@ import { adminAuth, adminRoutes, authRoutes, publicRoutes } from "./router.link"
 import Feature from "../feature";
 import AuthFeature from "../authFeature";
 import Signin from "../auth/signin";
-import { Helmet } from "react-helmet-async";
+import { Helmet } from "react-helmet";
 import AdminFeature from "../adminFeature";
 import AdminAuthFeature from "../adminAuthFeature";
 import AdminLogin from "../admin/authentication/login";
@@ -31,11 +31,11 @@ const Mainapp: React.FC = () => {
     setStyleLoaded(false); // Reset styleLoaded when pathname changes
 
     if (location.pathname.includes("/admin")) {
-      import("../../style/admin/main.scss")
+      import("../../assets/style/admin/main.scss")
         .then(() => setStyleLoaded(true))
         .catch((err) => console.error("Admin style load error: ", err));
     } else {
-      import("../../style/scss/main.scss")
+      import("../../assets/style/scss/main.scss")
         .then(() => setStyleLoaded(true))
         .catch((err) => console.error("Main style load error: ", err));
     }

@@ -1,4 +1,4 @@
-import React from 'react'
+
 import ImageWithBasePath from '../../../core/common/imageWithBasePath'
 import { Link } from 'react-router-dom';
 import Table from "../common/dataTable/index";
@@ -44,7 +44,7 @@ const Group = () => {
     {
       title: "Members",
       dataIndex: "Members",
-      render: (text: string, record: any) => (
+      render: (_text: string, record: any) => (
         <div className="avatar-list-stacked avatar-group-sm">
           <span className="avatar border-0">
             <ImageWithBasePath

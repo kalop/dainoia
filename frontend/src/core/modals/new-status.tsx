@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Link } from 'react-router-dom'
 import type { UploadProps } from 'antd';
 import { message, Upload } from 'antd';

@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import  { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import ImageWithBasePath from '../../../core/common/imageWithBasePath'
 import {Tooltip} from "antd";
 import BlockUser from '../../../core/modals/block-user';
 import ClearCalls from '../../../core/modals/clear-calls';
 import NewCall from '../../../core/modals/new-call';
-import Scrollbars from 'react-custom-scrollbars-2';
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 const AllCalls = () => {
     const [showCall,setShowCall] = useState(false)
     const [showSearch, setShowSearch] = useState(false);
@@ -138,17 +139,15 @@ const AllCalls = () => {
         </div>
         {/* /Chat Search */}
       </div>
-      <Scrollbars
-            autoHide
-            autoHideTimeout={1000}
-            autoHideDuration={200}
-            autoHeight
-            autoHeightMin={0}
-            autoHeightMax='88vh'
-            thumbMinSize={30}
-            universal={false}
-            hideTracksWhenNotNeeded={true}
-          >
+      <OverlayScrollbarsComponent
+        options={{
+          scrollbars: {
+            autoHide: 'scroll',
+            autoHideDelay: 1000,
+          },
+        }}
+        style={{ maxHeight: '88vh' }}
+      >
       <div className="chat-body chat-page-group ">
         <div className="messages">
           <div className="chats">
@@ -777,7 +776,7 @@ const AllCalls = () => {
           </div>
         </div>
       </div>
-      </Scrollbars>
+      </OverlayScrollbarsComponent>
     </div>
     <div className="chat-footer position-relative">
       <form className="footer-form">

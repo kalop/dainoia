@@ -1,4 +1,4 @@
-import React from "react";
+
 import {  Navigate, Route } from "react-router";
 import { all_routes } from "./all_routes";
 import Signin from "../auth/signin";
@@ -66,13 +66,11 @@ import { FormSelect } from "react-bootstrap";
 import FormWizard from "../uiInterface/forms/formelements/form-wizard";
 import GridGutters from "../uiInterface/forms/formelements/grid-gutters";
 import InputGroup from "../uiInterface/forms/formelements/input-group";
-import FeatherIcons from "../uiInterface/icons/feathericon";
 import FlagIcons from "../uiInterface/icons/flagicons";
 import FontawesomeIcons from "../uiInterface/icons/fontawesome";
 import IonicIcons from "../uiInterface/icons/ionicicons";
 import MaterialIcons from "../uiInterface/icons/materialicon";
 import PE7Icons from "../uiInterface/icons/pe7icons";
-import SimplelineIcons from "../uiInterface/icons/simplelineicon";
 import ThemifyIcons from "../uiInterface/icons/themify";
 import TypiconIcons from "../uiInterface/icons/typicons";
 import WeatherIcons from "../uiInterface/icons/weathericons";
@@ -541,12 +539,7 @@ export const adminRoutes = [
     route: Route,
     title:'Input Group'
   },
-  {
-    path: route.featherIcons,
-    element: <FeatherIcons />,
-    route: Route,
-    title:'Feather Icons'
-  },
+  
   {
     path: route.falgIcons,
     element: <FlagIcons />,
@@ -577,12 +570,7 @@ export const adminRoutes = [
     route: Route,
     title:'PE7 Icons'
   },
-  {
-    path: route.simpleLineIcon,
-    element: <SimplelineIcons />,
-    route: Route,
-    title:'Simple Line Icons'
-  },
+  
   {
     path: route.themifyIcon,
     element: <ThemifyIcons />,

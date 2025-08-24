@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { SidebarData } from '../core/data/json/sidebarData';
-import Scrollbars from 'react-custom-scrollbars-2';
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 import { setExpandMenu } from '../../../core/data/redux/commonSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -61,7 +62,15 @@ const AdminSidebar = () => {
     <>
   {/* Sidebar */}
   <div className="sidebar" id="sidebar" onMouseEnter={toggle} onMouseLeave={toggle2}>
-    <Scrollbars>
+    <OverlayScrollbarsComponent
+      options={{
+        scrollbars: {
+          autoHide: 'scroll',
+          autoHideDelay: 1000,
+        },
+      }}
+      style={{ maxHeight: '100vh' }}
+    >
     <div className="sidebar-inner slimscroll">
       <div id="sidebar-menu" className="sidebar-menu d-flex flex-column">
         
@@ -203,7 +212,7 @@ const AdminSidebar = () => {
         
       </div>
     </div>
-      </Scrollbars>
+    </OverlayScrollbarsComponent>
   </div>
   {/* /Sidebar */}
 </>

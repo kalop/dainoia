@@ -1,4 +1,4 @@
-import React from 'react'
+
 import UserModal from '../../common/modals/userModal'
 import ImageWithBasePath from '../../../../core/common/imageWithBasePath'
 import { Link } from 'react-router-dom'
@@ -235,7 +235,7 @@ const UserList = () => {
           </h6>
           <div className="d-flex align-items-center flex-wrap">
             <div className="input-icon-start mb-3 me-2 position-relative">
-            <PredefinedDateRanges />
+         <PredefinedDateRanges/>
             </div>
             <div className="dropdown mb-3 me-2">
               <div>

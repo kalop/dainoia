@@ -1,10 +1,11 @@
-import React, { useState } from 'react'
+import  { useState } from 'react'
 import { Link } from 'react-router-dom'
 import ImageWithBasePath from '../imageWithBasePath'
 import type { DatePickerProps } from 'antd';
 import { DatePicker } from 'antd';
 import LogoutModal from '../../modals/logout-modal';
-import Scrollbars from 'react-custom-scrollbars-2';
+import { OverlayScrollbarsComponent } from "overlayscrollbars-react";
+import "overlayscrollbars/overlayscrollbars.css";
 type PasswordField =  'confirmPassword' | 'newpassword' | 'oldpassword';
 const SettingsTab = () => {
   const [passwordVisibility, setPasswordVisibility] = useState({
@@ -27,16 +28,14 @@ const SettingsTab = () => {
     <>
         {/* Profile sidebar */}
         <div className="sidebar-content active slimscroll">
-        <Scrollbars
-            autoHide
-            autoHideTimeout={1000}
-            autoHideDuration={200}
-            autoHeight
-            autoHeightMin={0}
-            autoHeightMax='100vh'
-            thumbMinSize={30}
-            universal={false}
-            hideTracksWhenNotNeeded={true}
+        <OverlayScrollbarsComponent
+            options={{
+              scrollbars: {
+                autoHide: 'scroll',
+                autoHideDelay: 1000,
+              },
+            }}
+            style={{ maxHeight: '100vh' }}
           >
           <div className="slimscroll">
             <div className="chat-search-header">
@@ -1225,7 +1224,7 @@ const SettingsTab = () => {
               {/* Others */}
             </div>
           </div>
-          </Scrollbars>
+          </OverlayScrollbarsComponent>
         </div>
         {/* / Chats sidebar */}
     <LogoutModal showModal={showModal} setShowModal={setShowModal}/>
