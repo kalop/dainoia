@@ -43,6 +43,7 @@ const Sidebar = () => {
               <Tooltip title="Chat" placement="right" color={"#6338F6 "}>
                 <li>
                   <Link
+                    onClick={() => navigate(routes.chat)}
                     to={routes.index}
                     className={
                       location.pathname.includes(routes.index) ||
@@ -71,6 +72,7 @@ const Sidebar = () => {
               <Tooltip title="Group" placement="right" color={"#6338F6 "}>
                 <li>
                   <Link
+                    onClick={() => navigate(routes.groupChat)}
                     to="#"
                     className={
                       location.pathname.includes(routes.groupChat)
@@ -86,32 +88,6 @@ const Sidebar = () => {
               </Tooltip>
               <Tooltip title="Status" placement="right" color={"#6338F6 "}>
                 <li>
-                  {/* {location.pathname.includes(routes.status) || location.pathname.includes(routes.myStatus) || location.pathname.includes(routes.userStatus) ? (
-                    <Link
-                    to={routes.status}
-                    data-bs-toggle="tab"
-                    data-bs-target="#status-menu"
-                    className={
-                      location.pathname.includes(routes.status) || location.pathname.includes(routes.myStatus) || location.pathname.includes(routes.userStatus)
-                        ? "active"
-                        : ""
-                    }
-                  >
-                    <i className="ti ti-circle-dot" />
-                  </Link>
-                    
-                  ) : (
-                    <Link
-                      to={routes.status}
-                      className={
-                        location.pathname.includes(routes.status)
-                          ? "active"
-                          : ""
-                      }
-                    >
-                      <i className="ti ti-circle-dot" />
-                    </Link>
-                  )} */}
                   <Link
                     onClick={() => navigate(routes.status)}
                     to={routes.status}
@@ -132,7 +108,8 @@ const Sidebar = () => {
               <Tooltip title="Calls" placement="right" color={"#6338F6 "}>
                 <li>
                   <Link
-                    to="#"
+                    onClick={() => navigate(routes.allCalls)}
+                    to={routes.allCalls}
                     className={
                       location.pathname.includes(routes.allCalls)
                         ? "active"

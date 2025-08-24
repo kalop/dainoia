@@ -144,84 +144,84 @@ const GroupTab = () => {
     <>
       {/* Groups sidebar */}
       <div className="sidebar-content active slimscroll">
-        <OverlayScrollbarsComponent
-          options={{
-            scrollbars: {
-              autoHide: 'scroll',
-              autoHideDelay: 1000,
-            },
-          }}
-          style={{ maxHeight: '100vh' }}
-        >
-          <div className="slimscroll">
-            <div className="chat-search-header">
-              <div className="header-title d-flex align-items-center justify-content-between">
+      <OverlayScrollbarsComponent
+            options={{
+              scrollbars: {
+                autoHide: 'scroll',
+                autoHideDelay: 1000,
+              },
+            }}
+            style={{ maxHeight: '100vh' }}
+          >
+        <div className="slimscroll">
+          <div className="chat-search-header">
+            <div className="header-title d-flex align-items-center justify-content-between">
                 <h4 className="mb-3">Groups</h4>
-                <div className="d-flex align-items-center mb-3">
+              <div className="d-flex align-items-center mb-3">
+                <Link
+                  to="#"
+                  data-bs-toggle="modal"
+                  data-bs-target="#new-group"
+                  className="add-icon btn btn-primary p-0 d-flex align-items-center justify-content-center fs-16 me-2"
+                >
+                  <i className="ti ti-plus" />
+                </Link>
+                <div className="dropdown">
                   <Link
                     to="#"
-                    data-bs-toggle="modal"
-                    data-bs-target="#new-group"
-                    className="add-icon btn btn-primary p-0 d-flex align-items-center justify-content-center fs-16 me-2"
+                    data-bs-toggle="dropdown"
+                    className="fs-16 text-default"
                   >
-                    <i className="ti ti-plus" />
+                    <i className="ti ti-dots-vertical" />
                   </Link>
-                  <div className="dropdown">
-                    <Link
-                      to="#"
-                      data-bs-toggle="dropdown"
-                      className="fs-16 text-default"
-                    >
-                      <i className="ti ti-dots-vertical" />
-                    </Link>
-                    <ul className="dropdown-menu p-3">
-                      <li>
-                        <Link
-                          className="dropdown-item"
-                          to="#"
-                          data-bs-toggle="modal"
-                          data-bs-target="#invite"
-                        >
-                          <i className="ti ti-send me-2" />
-                          Invite Others
-                        </Link>
-                      </li>
-                    </ul>
-                  </div>
+                  <ul className="dropdown-menu p-3">
+                    <li>
+                      <Link
+                        className="dropdown-item"
+                        to="#"
+                        data-bs-toggle="modal"
+                        data-bs-target="#invite"
+                      >
+                        <i className="ti ti-send me-2" />
+                        Invite Others
+                      </Link>
+                    </li>
+                  </ul>
                 </div>
               </div>
+            </div>
               {/* Group Search */}
-              <div className="search-wrap">
+            <div className="search-wrap">
                 <form onSubmit={(e) => e.preventDefault()}>
-                  <div className="input-group">
-                    <input
-                      type="text"
-                      className="form-control"
+                <div className="input-group">
+                  <input
+                    type="text"
+                    className="form-control"
                       placeholder="Search for groups..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <span className="input-group-text">
-                      <i className="ti ti-search" />
-                    </span>
-                  </div>
-                </form>
-              </div>
-              {/* /Group Search */}
+                  />
+                  <span className="input-group-text">
+                    <i className="ti ti-search" />
+                  </span>
+                </div>
+              </form>
             </div>
-            <div className="sidebar-body chat-body">
+              {/* /Group Search */}
+          </div>
+          <div className="sidebar-body chat-body">
               {/* Left Group Title */}
-              <div className="d-flex justify-content-between align-items-center mb-3">
+            <div className="d-flex justify-content-between align-items-center mb-3">
                 <h5>All Groups ({filteredGroups.length})</h5>
-              </div>
+            </div>
               {/* /Left Group Title */}
-              <div className="chat-users-wrap">
+            <div className="chat-users-wrap">
                 {loading ? (
                   <div className="text-center p-4">
                     <div className="spinner-border" role="status">
                       <span className="visually-hidden">Loading...</span>
+                      </div>
                     </div>
-                  </div>
                 ) : error ? (
                   <div className="alert alert-danger m-3" role="alert">
                     {error}
@@ -230,7 +230,7 @@ const GroupTab = () => {
                   <div className="text-center p-4 text-muted">
                     <i className="ti ti-users fs-1 mb-3"></i>
                     <p>{searchQuery ? 'No groups found matching your search.' : 'No groups yet. Create your first group!'}</p>
-                  </div>
+                </div>
                 ) : (
                   filteredGroups.map(renderGroupItem)
                 )}

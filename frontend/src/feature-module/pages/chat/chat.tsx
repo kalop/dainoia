@@ -228,7 +228,7 @@ const Chat = () => {
                 ) : error ? (
                   <div className="alert alert-danger m-3" role="alert">
                     {error}
-                  </div>
+                      </div>
                 ) : messages.length === 0 ? (
                   <div className="empty-chat-state">
                     <div className="text-center text-muted">

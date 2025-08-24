@@ -81,147 +81,147 @@ const GroupChat = () => {
     const isOwnMessage = message.sender_id === user?.id;
     const messageTime = formatTime(message.timestamp);
   
-    return (
+  return (
       <div key={message.id} className={`chats ${isOwnMessage ? 'chats-right' : ''}`}>
         {!isOwnMessage && (
-          <div className="chat-avatar">
-            <ImageWithBasePath
+                    <div className="chat-avatar">
+                      <ImageWithBasePath
               src={message.sender_avatar || "assets/img/profiles/avatar-06.jpg"}
-              className="rounded-circle"
+                        className="rounded-circle"
               alt="avatar"
-            />
-          </div>
+                      />
+                    </div>
         )}
         
-        <div className="chat-content">
+                    <div className="chat-content">
           <div className={`chat-profile-name ${isOwnMessage ? 'text-end' : ''}`}>
-            <h6>
+                        <h6>
               {isOwnMessage ? 'You' : message.sender_name}
-              <i className="ti ti-circle-filled fs-7 mx-2" />
+                          <i className="ti ti-circle-filled fs-7 mx-2" />
               <span className="chat-time">{messageTime}</span>
               {isOwnMessage && (
-                <span className="msg-read success">
-                  <i className="ti ti-checks" />
-                </span>
+                          <span className="msg-read success">
+                            <i className="ti ti-checks" />
+                          </span>
               )}
-            </h6>
-          </div>
+                        </h6>
+                      </div>
           
-          <div className="chat-info">
-            <div className="message-content">
+                      <div className="chat-info">
+                        <div className="message-content">
               {message.message_type === 'file' ? (
-                <div className="file-attach">
-                  <span className="file-icon">
-                    <i className="ti ti-files" />
-                  </span>
-                  <div className="ms-2 overflow-hidden">
+                          <div className="file-attach">
+                            <span className="file-icon">
+                              <i className="ti ti-files" />
+                            </span>
+                            <div className="ms-2 overflow-hidden">
                     <h6 className="mb-1">{message.file_name || 'File'}</h6>
                     <p>{message.file_size ? `${(message.file_size / 1024).toFixed(2)} KB` : 'Unknown size'}</p>
-                  </div>
+                            </div>
                   <Link to={message.file_url || '#'} className="download-icon">
-                    <i className="ti ti-download" />
-                  </Link>
-                </div>
+                              <i className="ti ti-download" />
+                            </Link>
+                          </div>
               ) : message.message_type === 'image' ? (
-                <div className="chat-img">
+                          <div className="chat-img">
                   {message.images?.map((image: string, index: number) => (
                     <div key={index} className="img-wrap">
-                      <ImageWithBasePath
+                              <ImageWithBasePath
                         src={image}
                         alt={`Image ${index + 1}`}
-                      />
-                      <div className="img-overlay">
-                        <Link
+                              />
+                              <div className="img-overlay">
+                                <Link
                           onClick={() => handleImageClick(message.images || [], index)}
-                          className="gallery-img"
-                          to="#"
+                                  className="gallery-img"
+                                  to="#"
                           title={`Image ${index + 1}`}
-                        >
-                          <i className="ti ti-eye" />
-                        </Link>
+                                >
+                                  <i className="ti ti-eye" />
+                                </Link>
                         <Link to={image} download>
-                          <i className="ti ti-download" />
-                        </Link>
-                      </div>
-                    </div>
+                                  <i className="ti ti-download" />
+                                </Link>
+                              </div>
+                            </div>
                   ))}
                   {message.images && message.images.length > 5 && (
-                    <Link
-                      className="gallery-img view-all d-flex align-items-center justify-content-center mt-3"
-                      to="#"
+                          <Link
+                            className="gallery-img view-all d-flex align-items-center justify-content-center mt-3"
+                            to="#"
                       onClick={() => handleImageClick(message.images || [])}
-                    >
-                      View All Images
-                      <i className="ti ti-arrow-right ms-2" />
-                    </Link>
+                          >
+                            View All Images
+                            <i className="ti ti-arrow-right ms-2" />
+                          </Link>
                   )}
-                </div>
+                                </div>
               ) : message.message_type === 'video' ? (
-                <div className="message-video">
-                  <video width={400} controls>
+                          <div className="message-video">
+                            <video width={400} controls>
                     <source src={message.video_url} type="video/mp4" />
-                    Your browser does not support HTML5 video.
-                  </video>
-                </div>
+                              Your browser does not support HTML5 video.
+                            </video>
+                          </div>
               ) : (
                 message.content
               )}
-            </div>
+                                </div>
             
-            <div className="chat-actions">
-              <Link className="#" to="#" data-bs-toggle="dropdown">
-                <i className="ti ti-dots-vertical" />
-              </Link>
-              <ul className="dropdown-menu dropdown-menu-end p-3">
-                <li>
-                  <Link
-                    className="dropdown-item"
+                        <div className="chat-actions">
+                          <Link className="#" to="#" data-bs-toggle="dropdown">
+                            <i className="ti ti-dots-vertical" />
+                          </Link>
+                          <ul className="dropdown-menu dropdown-menu-end p-3">
+                            <li>
+                              <Link
+                                className="dropdown-item"
                     onClick={() => setReplyTo(message)} 
-                    to="#"
-                  >
-                    <i className="ti ti-arrow-back-up me-2" />
-                    Reply
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="#">
-                    <i className="ti ti-arrow-forward-up-double me-2" />
-                    Forward
-                  </Link>
-                </li>
-                <li>
-                  <Link className="dropdown-item" to="#">
+                                to="#"
+                              >
+                                <i className="ti ti-arrow-back-up me-2" />
+                                Reply
+                              </Link>
+                            </li>
+                            <li>
+                              <Link className="dropdown-item" to="#">
+                                <i className="ti ti-arrow-forward-up-double me-2" />
+                                Forward
+                              </Link>
+                            </li>
+                            <li>
+                              <Link className="dropdown-item" to="#">
                     <i className="ti ti-file-export me-2" />
                     Copy
-                  </Link>
-                </li>
+                              </Link>
+                            </li>
                 {isOwnMessage && (
-                  <li>
-                    <Link
-                      className="dropdown-item"
+                            <li>
+                              <Link
+                                className="dropdown-item"
                       onClick={() => deleteMessage(message.id)}
-                      to="#"
+                                to="#"
                     >
-                      <i className="ti ti-trash me-2" />
+                                <i className="ti ti-trash me-2" />
                       Delete
-                    </Link>
-                  </li>
+                              </Link>
+                            </li>
                 )}
-              </ul>
-            </div>
-          </div>
-        </div>
+                          </ul>
+                        </div>
+                                </div>
+                          </div>
         
         {isOwnMessage && (
-          <div className="chat-avatar">
-            <ImageWithBasePath
+                    <div className="chat-avatar">
+                      <ImageWithBasePath
               src={user?.avatar_url || "assets/img/profiles/avatar-17.jpg"}
-              className="rounded-circle dreams_chat"
+                        className="rounded-circle dreams_chat"
               alt="avatar"
-            />
-          </div>
+                      />
+                    </div>
         )}
-      </div>
+                  </div>
     );
   };
 
@@ -237,117 +237,117 @@ const GroupChat = () => {
                 </Link>
               </div>
               <div className="avatar avatar-lg online flex-shrink-0">
-                <ImageWithBasePath
+                      <ImageWithBasePath
                   src={groupInfo?.avatar_url || "assets/img/groups/group-01.jpg"}
-                  className="rounded-circle"
+                        className="rounded-circle"
                   alt="group"
-                />
-              </div>
+                      />
+                    </div>
               <div className="ms-2 overflow-hidden">
                 <h6>{groupInfo?.name || 'Loading...'}</h6>
                 <p className="last-seen text-truncate">
                   {groupInfo?.member_count || 0} Member{groupInfo?.member_count !== 1 ? 's' : ''}, 
                   <span className="text-success"> {groupInfo?.online_count || 0} Online</span>
                 </p>
-              </div>
-            </div>
+                      </div>
+                          </div>
             <div className="chat-options">
-              <ul>
-                <li>
+                                  <ul>
+                                    <li>
                   <div className="avatar-list-stacked avatar-group-md d-flex">
                                          {groupInfo?.online_members?.slice(0, 4).map((member: any, index: number) => (
                        <span key={index} className="avatar avatar-rounded">
-                         <ImageWithBasePath
+                                        <ImageWithBasePath
                            src={member.avatar_url || "assets/img/profiles/avatar-06.jpg"}
                            alt="member"
                          />
                        </span>
                      ))}
                     {groupInfo?.member_count && groupInfo.member_count > 4 && (
-                      <Link
+                                <Link
                         className="avatar bg-primary avatar-rounded text-fixed-white"
-                        to="#"
-                      >
+                                  to="#"
+                                >
                         {groupInfo.member_count - 4}+
-                      </Link>
+                                </Link>
                     )}
-                  </div>
+                          </div>
                 </li>
                 <li>
                   <Tooltip title="Search" placement="bottom">
-                    <Link
-                      to="#"
+                              <Link
+                                to="#"
                       className="btn chat-search-btn"
                       onClick={toggleSearch}
-                    >
+                              >
                       <i className="ti ti-search" />
-                    </Link>
+                              </Link>
                   </Tooltip>
-                </li>
-                <li>
+                            </li>
+                            <li>
                   <Tooltip title="Group Info" placement="bottom">
-                    <Link
-                      to="#"
+                              <Link
+                                to="#"
                       className="btn"
                       data-bs-toggle="offcanvas"
                       data-bs-target="#contact-profile"
-                    >
+                              >
                       <i className="ti ti-info-circle" />
-                    </Link>
+                              </Link>
                   </Tooltip>
-                </li>
-                <li>
-                  <Link
+                              </li>
+                              <li>
+                                <Link
                     className="btn no-bg"
-                    to="#"
+                                  to="#"
                     data-bs-toggle="dropdown"
                   >
-                    <i className="ti ti-dots-vertical" />
-                  </Link>
-                  <ul className="dropdown-menu dropdown-menu-end p-3">
-                    <li>
+                            <i className="ti ti-dots-vertical" />
+                          </Link>
+                          <ul className="dropdown-menu dropdown-menu-end p-3">
+                            <li>
                       <Link to={all_routes.index} className="dropdown-item">
                         <i className="ti ti-x me-2" />
                         Close Group
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="#"
                         className="dropdown-item"
                         data-bs-toggle="modal"
                         data-bs-target="#mute-notification"
-                      >
+                              >
                         <i className="ti ti-volume-off me-2" />
                         Mute Notification
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="#"
                         className="dropdown-item"
                         data-bs-toggle="modal"
                         data-bs-target="#clear-chat"
-                      >
+                              >
                         <i className="ti ti-clear-all me-2" />
                         Clear Message
-                      </Link>
-                    </li>
-                    <li>
-                      <Link
-                        to="#"
+                              </Link>
+                            </li>
+                            <li>
+                              <Link
+                                to="#"
                         className="dropdown-item"
                         data-bs-toggle="modal"
                         data-bs-target="#delete-chat"
                       >
-                        <i className="ti ti-trash me-2" />
-                        Delete Group
-                      </Link>
-                    </li>
-                  </ul>
-                </li>
-              </ul>
-            </div>
+                                <i className="ti ti-trash me-2" />
+                                Delete Group
+                              </Link>
+                            </li>
+                          </ul>
+                                    </li>
+                                  </ul>
+                                </div>
             {/* Chat Search */}
             <div
               className={`chat-search search-wrap contact-search ${
@@ -364,10 +364,10 @@ const GroupChat = () => {
                   <span className="input-group-text">
                     <i className="ti ti-search" />
                   </span>
-                </div>
+                    </div>
               </form>
-            </div>
-          </div>
+                  </div>
+                    </div>
           
           <OverlayScrollbarsComponent
             options={{
@@ -384,12 +384,12 @@ const GroupChat = () => {
                   <div className="text-center p-4">
                     <div className="spinner-border" role="status">
                       <span className="visually-hidden">Loading...</span>
-                    </div>
-                  </div>
+                              </div>
+                        </div>
                 ) : error ? (
                   <div className="alert alert-danger m-3" role="alert">
                     {error}
-                  </div>
+                      </div>
                 ) : messages.length === 0 ? (
                   <div className="empty-chat-state">
                     <div className="text-center text-muted">
@@ -403,21 +403,21 @@ const GroupChat = () => {
                     <div ref={messagesEndRef} />
                   </>
                 )}
+                </div>
               </div>
-            </div>
-          </OverlayScrollbarsComponent>
-        </div>
+            </OverlayScrollbarsComponent>
+          </div>
 
-        <div className="chat-footer">
+          <div className="chat-footer">
           <form className="footer-form" onSubmit={handleSendMessage}>
-            <div className="chat-footer-wrap">
-              <div className="form-item">
-                <Link to="#" className="action-circle">
-                  <i className="ti ti-microphone" />
-                </Link>
-              </div>
+              <div className="chat-footer-wrap">
+                <div className="form-item">
+                  <Link to="#" className="action-circle">
+                    <i className="ti ti-microphone" />
+                  </Link>
+                </div>
               
-              <div className="form-wrap">
+                <div className="form-wrap">
                 {replyTo && (
                   <div className="chats reply-chat d-flex">
                     <div className="chat-avatar">
@@ -449,47 +449,47 @@ const GroupChat = () => {
                   </div>
                 )}
                 
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="Type Your Message"
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Type Your Message"
                   value={messageText}
                   onChange={(e) => setMessageText(e.target.value)}
-                />
-              </div>
+                  />
+                </div>
               
-              <div className="form-item emoj-action-foot">
-                <Link
-                  to="#"
-                  className="action-circle"
+                <div className="form-item emoj-action-foot">
+                  <Link
+                    to="#"
+                    className="action-circle"
                   onClick={() => toggleEmoji(0)}
-                >
-                  <i className="ti ti-mood-smile" />
-                </Link>
-              </div>
+                  >
+                    <i className="ti ti-mood-smile" />
+                  </Link>
+                  </div>
               
               <div className="form-item position-relative d-flex align-items-center justify-content-center">
                 <Link to="#" className="action-circle file-action position-absolute">
-                  <i className="ti ti-folder" />
-                </Link>
-                <input
-                  type="file"
-                  className="open-file position-relative"
-                  name="files"
-                  id="files"
+                    <i className="ti ti-folder" />
+                  </Link>
+                  <input
+                    type="file"
+                    className="open-file position-relative"
+                    name="files"
+                    id="files"
                   onChange={handleFileUpload}
-                />
-              </div>
+                  />
+                </div>
               
-              <div className="form-btn">
+                <div className="form-btn">
                 <button className="btn btn-primary" type="submit" disabled={loading}>
-                  <i className="ti ti-send" />
-                </button>
+                    <i className="ti ti-send" />
+                  </button>
+                </div>
               </div>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
-      </div>
 
       <Lightbox
         open={openLightbox}
