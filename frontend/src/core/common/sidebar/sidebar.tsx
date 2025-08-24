@@ -86,7 +86,7 @@ const Sidebar = () => {
                   </Link>
                 </li>
               </Tooltip>
-              <Tooltip title="Status" placement="right" color={"#6338F6 "}>
+              {/*<Tooltip title="Status" placement="right" color={"#6338F6 "}>
                 <li>
                   <Link
                     onClick={() => navigate(routes.status)}
@@ -121,7 +121,7 @@ const Sidebar = () => {
                     <i className="ti ti-phone-call" />
                   </Link>
                 </li>
-              </Tooltip>
+              </Tooltip>*/}
               <Tooltip title="Profile" placement="right" color={"#6338F6 "}>
                 <li>
                   <Link
