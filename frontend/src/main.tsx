@@ -23,7 +23,7 @@ createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <Helmet>
       <title>DreamsChat</title>
-      <meta name="description" content="DreamsChat - The best chat experience." />
+      <meta name="description" content="Dainoia" />
     </Helmet>
     <Provider store={Store}>
       <BrowserRouter basename={base_path}>
